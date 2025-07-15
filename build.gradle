@@ -35,12 +35,19 @@ dependencies {
 	//	web client
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework:spring-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
