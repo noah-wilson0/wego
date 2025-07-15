@@ -31,11 +31,11 @@ public class TravelPlanDateController {
         return ResponseEntity.ok(scheduleDate);
     }
 
-    @GetMapping("/temp/schedule/times/{uuid}")
+    @PostMapping("/temp/schedule/times/{uuid}")
     public void createScheduleTimes(@PathVariable  String uuid, @RequestBody TravelTimeRequest travelTimeRequest) {
         travelPlanDateService.saveScheduleTime(uuid, travelTimeRequest);
     }
-    @PostMapping("/temp/schedule/times/{uuid}")
+    @GetMapping("/temp/schedule/times/{uuid}")
     public ResponseEntity<String> getScheduleTimes(@PathVariable  String uuid) {
         String scheduleTime = travelPlanDateService.getScheduleTime(uuid);
         return ResponseEntity.ok(scheduleTime);

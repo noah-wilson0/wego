@@ -44,7 +44,7 @@ public class TravelPlanDateService {
         }
     }
     public String getScheduleTime(String uuid) {
-        String scheduleDate = redisTemplate.opsForValue().get(RedisKeyUtils.timeKey(RedisKeyUtils.dateKey(uuid)));
+        String scheduleDate = redisTemplate.opsForValue().get(RedisKeyUtils.timeKey(uuid));
 
         if (scheduleDate == null) {
             log.info("여행 일정 날짜별 시간 읽기 실패");

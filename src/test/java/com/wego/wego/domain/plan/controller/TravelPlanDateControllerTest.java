@@ -3,6 +3,7 @@ package com.wego.wego.domain.plan.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.TravelDateRequest;
+import com.wego.wego.domain.plan.dto.TravelTimeRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -55,11 +59,26 @@ class TravelPlanDateControllerTest {
 
 
     @Test
-    void createScheduleTimes() {
+    void createScheduleTimes() throws Exception {
+        TravelTimeRequest travelTimeRequest = new TravelTimeRequest(
+                List.of(
+                        new TravelTimeRequest.TravelDayTimes(LocalDate.of(2025, 8, 1), LocalTime.of(10,0),LocalTime.of(20,0)),
+                        new TravelTimeRequest.TravelDayTimes(LocalDate.of(2025, 8, 2), LocalTime.of(10,0),LocalTime.of(20,0)),
+                        new TravelTimeRequest.TravelDayTimes(LocalDate.of(2025, 8, 3), LocalTime.of(10,0),LocalTime.of(14,0))
+                        )
+        );
+        mockMvc.perform(post("/travel_plan/date/temp/schedule/times/"+UUID)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(travelTimeRequest)))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void getScheduleTimes() {
+    void getScheduleTimes() throws Exception {
+        MvcResult result = mockMvc.perform(get("/travel_plan/date/temp/schedule/times/" + UUID))
+                .andExpect(status().isOk())
+                .andReturn();
+        log.info(result.getResponse().getContentAsString());
     }
 
 }
