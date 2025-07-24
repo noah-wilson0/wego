@@ -13,8 +13,10 @@ import java.util.Optional;
 @Repository
 public interface CityCodeRepository extends JpaRepository<CityCode, Long> {
 
-    public Optional<CityCode> findByCityCode(String cityCode);
-    public Optional<CityCode> findByName(String name);
+    Optional<CityCode> findByCityCode(String cityCode);
+    Optional<CityCode> findByName(String name);
+
+    Optional<CityCode> findByAreaCodeAndName(AreaCode areaCode, String name);
 
     @Query("SELECT c FROM CityCode c WHERE c.cityCode = :cityCode AND c.areaCode.areaCodeId = :areaCodeId")
     Optional<CityCode> findByCityCodeAndAreaCodeId(@Param("cityCode") String cityCode, @Param("areaCodeId") Long areaCodeId);

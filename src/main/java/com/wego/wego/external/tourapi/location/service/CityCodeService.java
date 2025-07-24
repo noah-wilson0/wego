@@ -26,6 +26,10 @@ public class CityCodeService {
     public Optional<CityCode> findByName(String name) {
         return cityCodeRepository.findByName(name);
     }
+    public Optional<CityCode> findByAreaCodeAndName(AreaCode areaCode, String cityCode) {
+        return cityCodeRepository.findByAreaCodeAndName(areaCode, cityCode);
+    }
+
     public Optional<CityCode> findByCityCodeAndAreaCodeId(String cityCode, Long areaCodeId) {
         return cityCodeRepository.findByCityCodeAndAreaCodeId(cityCode, areaCodeId);
     }

@@ -25,12 +25,23 @@ public class PlaceService {
         return placeRepository.findById(id);
     }
 
+    public List<Place> findByTitleContaining(String title) {
+        return placeRepository.findByTitleContaining(title);
+    }
+    public List<Place> findByFullAddress(String fullAddr) {
+        return placeRepository.findByFullAddress(fullAddr);
+    }
+
     public Optional<Place> findByContentId(String contentId) {
         return placeRepository.findByContentId(contentId);
     }
 
     public Place findByTitle(String title) {
         return placeRepository.findByTitle(title);
+    }
+
+    public Optional<Place> findMostSimilarTitleInCity(String title, Long cityCodeId) {
+        return placeRepository.findMostSimilarTitleInCity(title, cityCodeId);
     }
 
     public List<Place> findAll() {

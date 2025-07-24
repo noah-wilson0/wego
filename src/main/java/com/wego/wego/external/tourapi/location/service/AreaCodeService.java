@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.geom.Area;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,10 @@ public class AreaCodeService {
 
     public Optional<AreaCode> findByName(String name) {
         return areaCodeRepository.findByName(name);
+    }
+
+    public Optional<AreaCode> findByNameContainedIn(String name) {
+        return areaCodeRepository.findByNameContainedIn(name);
     }
 
     public List<AreaCode> findAll() {

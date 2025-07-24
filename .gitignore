@@ -39,3 +39,4 @@ out/
 
 ### 민감한 설정 파일 (Git에 포함 금지) ###
 /src/main/resources/application-local-secret.properties
+src/main/resources/gemini-key.json
