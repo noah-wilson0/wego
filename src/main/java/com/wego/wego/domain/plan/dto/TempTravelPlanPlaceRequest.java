@@ -1,4 +1,5 @@
 package com.wego.wego.domain.plan.dto;
 
-public class TempTravelPlanPlaceRequest {
-}
+public record TempTravelPlanPlaceRequest (
+        String contentId
+){ }

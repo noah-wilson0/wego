@@ -148,29 +148,29 @@ public class GeminiRequestService {
         String response;
 
         // 예시 응답 JSON 직렬화
-        TravelPlanGeminiResponse.Days.Places place1 = new TravelPlanGeminiResponse.Days.Places(
+        TempTravelPlanGeminiResponse.Days.Places place1 = new TempTravelPlanGeminiResponse.Days.Places(
                 "성산 일출봉",
                 "제주특별자치도 서귀포시 성산읍",
                 "064-123-4567"
         );
-        TravelPlanGeminiResponse.Days.Places place2 = new TravelPlanGeminiResponse.Days.Places(
+        TempTravelPlanGeminiResponse.Days.Places place2 = new TempTravelPlanGeminiResponse.Days.Places(
                 "섭지코지",
                 "제주특별자치도 서귀포시 성산읍 고성리",
                 "064-987-6543"
         );
-        TravelPlanGeminiResponse.Days.Accommodation accommodation = new TravelPlanGeminiResponse.Days.Accommodation(
+        TempTravelPlanGeminiResponse.Days.Accommodation accommodation = new TempTravelPlanGeminiResponse.Days.Accommodation(
                 "라마다 제주 호텔",
                 "제주특별자치도 제주시 연동",
                 "064-000-1111"
         );
-        TravelPlanGeminiResponse.Days day = new TravelPlanGeminiResponse.Days(
+        TempTravelPlanGeminiResponse.Days day = new TempTravelPlanGeminiResponse.Days(
                 "2025-07-15",
                 "09:00",
                 "18:00",
                 List.of(place1, place2),
                 List.of(accommodation)
         );
-        TravelPlanGeminiResponse exampleResponse = new TravelPlanGeminiResponse(
+        TempTravelPlanGeminiResponse exampleResponse = new TempTravelPlanGeminiResponse(
                 travelPlanForGeminiRequest.start_date(),
                 travelPlanForGeminiRequest.end_date(),
                 List.of(day)
@@ -183,15 +183,15 @@ public class GeminiRequestService {
     private TravelPlanForGeminiRequest getTravelDateTime(String uuid) {
         String travelDate = getTravelDate(uuid);
         String travelTime = getTravelTime(uuid);
-        TravelDateRequest travelDateRequest;
-        TravelTimeRequest travelTimeRequest;
+        TempTravelDateRequest tempTravelDateRequest;
+        TempTravelTimeRequest tempTravelTimeRequest;
         try {
-            travelDateRequest = objectMapper.readValue(travelDate, TravelDateRequest.class);
-            travelTimeRequest = objectMapper.readValue(travelTime, TravelTimeRequest.class);
+            tempTravelDateRequest = objectMapper.readValue(travelDate, TempTravelDateRequest.class);
+            tempTravelTimeRequest = objectMapper.readValue(travelTime, TempTravelTimeRequest.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        List<TravelPlanForGeminiRequest.TravelDayForAi> travelDayForAiList = travelTimeRequest.travelDayTimes().stream()
+        List<TravelPlanForGeminiRequest.TravelDayForAi> travelDayForAiList = tempTravelTimeRequest.travelDayTimes().stream()
                 .map(day -> new TravelPlanForGeminiRequest.TravelDayForAi(
                         day.date().toString(),
                         day.startTime().toString(),
@@ -199,8 +199,8 @@ public class GeminiRequestService {
                 ))
                 .toList();
         return new TravelPlanForGeminiRequest(
-                travelDateRequest.startDate(),
-                travelDateRequest.endDate(),
+                tempTravelDateRequest.startDate(),
+                tempTravelDateRequest.endDate(),
                 travelDayForAiList
         );
 

@@ -1,6 +1,8 @@
 package com.wego.wego.external.tourapi.place.repository;
 
 import com.wego.wego.external.tourapi.place.entity.Place;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -29,6 +31,12 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("SELECT p FROM Place p WHERE TRIM(CONCAT(p.addr1, ' ', COALESCE(p.addr2, ''))) = :fullAddr")
     List<Place> findByFullAddress(@Param("fullAddr") String fullAddr);
+
+
+    Page<Place> findByPlaceType(String placeType, Pageable pageable);
+
+
+
     //유사도 테스트용
     @Query(value = """
     SELECT title, similarity(title, :title) AS sim
