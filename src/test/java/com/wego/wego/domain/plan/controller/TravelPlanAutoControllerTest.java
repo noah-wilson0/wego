@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.AreaCityTokens;
 import com.wego.wego.domain.plan.dto.RetryFailedDay;
-import com.wego.wego.domain.plan.dto.TravelPlanGeminiResponse;
+import com.wego.wego.domain.plan.dto.TempTravelPlanGeminiResponse;
 import com.wego.wego.domain.plan.service.GeminiRequestService;
 import com.wego.wego.external.tourapi.location.entity.AreaCode;
 import com.wego.wego.external.tourapi.location.entity.CityCode;
@@ -16,7 +16,6 @@ import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.util.RedisKeyUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +63,7 @@ class TravelPlanAutoControllerTest {
     private final String UUID = "Test-uuid-123";
 
     String result;
-    TravelPlanGeminiResponse travelPlanGeminiResponse;
+    TempTravelPlanGeminiResponse tempTravelPlanGeminiResponse;
     @Autowired
     private GeminiRequestService geminiRequestService;
 
@@ -91,7 +90,7 @@ class TravelPlanAutoControllerTest {
                 .andReturn().getResponse().getContentAsString();
         log.info("ai요청 결과:{{}",result);
 
-        travelPlanGeminiResponse = objectMapper.readValue(result, TravelPlanGeminiResponse.class);
+        tempTravelPlanGeminiResponse = objectMapper.readValue(result, TempTravelPlanGeminiResponse.class);
     }
 
     /**
@@ -116,7 +115,7 @@ class TravelPlanAutoControllerTest {
 //    @Test
     void autoTempTravelPlanV1() throws Exception {
 
-        travelPlanGeminiResponse.days().stream().forEach(
+        tempTravelPlanGeminiResponse.days().stream().forEach(
                 day -> {
                     day.places().stream().forEach(
                             place -> {
@@ -174,10 +173,10 @@ class TravelPlanAutoControllerTest {
 
         final int MAX_RETRY = 5;
 
-        travelPlanGeminiResponse.days().forEach(day -> {
+        tempTravelPlanGeminiResponse.days().forEach(day -> {
             day.places().forEach(place -> {
                 Optional<Place> mostSimilarTitleInCity = Optional.empty();
-                TravelPlanGeminiResponse.Days.Places currentPlace = place;
+                TempTravelPlanGeminiResponse.Days.Places currentPlace = place;
 
                 int retryCount = 0;
                 boolean matched = false;
@@ -216,11 +215,11 @@ class TravelPlanAutoControllerTest {
 
                         try {
                             String newRecommendationJson = geminiRequestService.retryGeminiTravelPlan(
-                                    objectMapper.writeValueAsString(travelPlanGeminiResponse),
+                                    objectMapper.writeValueAsString(tempTravelPlanGeminiResponse),
                                     retry
                             );
 
-                            List<TravelPlanGeminiResponse.Days.Places> retryPlaces =
+                            List<TempTravelPlanGeminiResponse.Days.Places> retryPlaces =
                                     objectMapper.readValue(newRecommendationJson, new TypeReference<>() {});
                             if (!retryPlaces.isEmpty()) {
                                 currentPlace = retryPlaces.get(0);
@@ -261,10 +260,10 @@ class TravelPlanAutoControllerTest {
 
         final int MAX_RETRY = 5;
 
-        travelPlanGeminiResponse.days().forEach(day -> {
+        tempTravelPlanGeminiResponse.days().forEach(day -> {
             day.places().forEach(place -> {
                 Optional<Place> mostSimilarTitleInCity = Optional.empty();
-                TravelPlanGeminiResponse.Days.Places currentPlace = place;
+                TempTravelPlanGeminiResponse.Days.Places currentPlace = place;
 
                 int retryCount = 0;
                 boolean matched = false;
@@ -297,11 +296,11 @@ class TravelPlanAutoControllerTest {
 
                         try {
                             String newRecommendationJson = geminiRequestService.retryGeminiTravelPlan(
-                                    objectMapper.writeValueAsString(travelPlanGeminiResponse),
+                                    objectMapper.writeValueAsString(tempTravelPlanGeminiResponse),
                                     retry
                             );
 
-                            List<TravelPlanGeminiResponse.Days.Places> retryPlaces =
+                            List<TempTravelPlanGeminiResponse.Days.Places> retryPlaces =
                                     objectMapper.readValue(newRecommendationJson, new TypeReference<>() {});
                             if (!retryPlaces.isEmpty()) {
                                 currentPlace = retryPlaces.get(0);

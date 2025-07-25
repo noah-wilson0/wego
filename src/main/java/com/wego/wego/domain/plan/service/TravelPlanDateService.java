@@ -2,8 +2,8 @@ package com.wego.wego.domain.plan.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wego.wego.domain.plan.dto.TravelDateRequest;
-import com.wego.wego.domain.plan.dto.TravelTimeRequest;
+import com.wego.wego.domain.plan.dto.TempTravelDateRequest;
+import com.wego.wego.domain.plan.dto.TempTravelTimeRequest;
 import com.wego.wego.global.util.RedisKeyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,9 @@ public class TravelPlanDateService {
     private final RedisTemplate<String,String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public void saveTempScheduleDate(String uuid, TravelDateRequest travelDateRequest) {
+    public void saveTempScheduleDate(String uuid, TempTravelDateRequest tempTravelDateRequest) {
         try {
-            redisTemplate.opsForValue().set(RedisKeyUtils.dateKey(uuid),objectMapper.writeValueAsString(travelDateRequest),6, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(RedisKeyUtils.dateKey(uuid),objectMapper.writeValueAsString(tempTravelDateRequest),6, TimeUnit.HOURS);
         } catch (JsonProcessingException e) {
             log.info("여행 일정 날짜 캐시 실패");
             throw new RuntimeException(e);
@@ -35,9 +35,9 @@ public class TravelPlanDateService {
         }
         return scheduleDate;
     }
-    public void saveTempScheduleTime(String uuid, TravelTimeRequest travelTimeRequest) {
+    public void saveTempScheduleTime(String uuid, TempTravelTimeRequest tempTravelTimeRequest) {
         try {
-            redisTemplate.opsForValue().set(RedisKeyUtils.timeKey(uuid),objectMapper.writeValueAsString(travelTimeRequest),6, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(RedisKeyUtils.timeKey(uuid),objectMapper.writeValueAsString(tempTravelTimeRequest),6, TimeUnit.HOURS);
         } catch (JsonProcessingException e) {
             log.info("여행 일정 날짜별 시간 캐시 실패");
             throw new RuntimeException(e);

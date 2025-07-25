@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.AreaCityTokens;
 import com.wego.wego.domain.plan.dto.RetryFailedDay;
-import com.wego.wego.domain.plan.dto.TravelPlanGeminiResponse;
+import com.wego.wego.domain.plan.dto.TempTravelPlanGeminiResponse;
 import com.wego.wego.external.tourapi.location.entity.AreaCode;
 import com.wego.wego.external.tourapi.location.entity.CityCode;
 import com.wego.wego.external.tourapi.location.service.AreaCodeService;
@@ -44,22 +44,22 @@ public class TravelPlanAiMatchingService {
         log.info("🚀 여행 일정 자동 생성 시작 - UUID: {}", uuid);
 
         String result = geminiRequestService.getGeminiTravelPlan(uuid);
-        TravelPlanGeminiResponse travelPlanGeminiResponse;
+        TempTravelPlanGeminiResponse tempTravelPlanGeminiResponse;
         try {
-            travelPlanGeminiResponse = objectMapper.readValue(result, TravelPlanGeminiResponse.class);
+            tempTravelPlanGeminiResponse = objectMapper.readValue(result, TempTravelPlanGeminiResponse.class);
             log.info("✅ Gemini 추천 일정 파싱 완료");
         } catch (JsonProcessingException e) {
             throw new RuntimeException("❌ Gemini JSON 파싱 실패", e);
         }
 
-        List<TravelPlanGeminiResponse.Days> updatedDays = new ArrayList<>();
+        List<TempTravelPlanGeminiResponse.Days> updatedDays = new ArrayList<>();
 
-        for (TravelPlanGeminiResponse.Days day : travelPlanGeminiResponse.days()) {
+        for (TempTravelPlanGeminiResponse.Days day : tempTravelPlanGeminiResponse.days()) {
             log.info("📅 [{}] 일정 처리 시작", day.date());
-            List<TravelPlanGeminiResponse.Days.Places> updatedPlaces = new ArrayList<>();
+            List<TempTravelPlanGeminiResponse.Days.Places> updatedPlaces = new ArrayList<>();
 
-            for (TravelPlanGeminiResponse.Days.Places place : day.places()) {
-                TravelPlanGeminiResponse.Days.Places currentPlace = place;
+            for (TempTravelPlanGeminiResponse.Days.Places place : day.places()) {
+                TempTravelPlanGeminiResponse.Days.Places currentPlace = place;
 
                 log.info("🔍 AI 장소 후보: {}", currentPlace.title());
                 Optional<Place> mostSimilarTitleInCity = Optional.empty();
@@ -106,11 +106,11 @@ public class TravelPlanAiMatchingService {
 
                         try {
                             String newRecommendationJson = geminiRequestService.retryGeminiTravelPlan(
-                                    objectMapper.writeValueAsString(travelPlanGeminiResponse),
+                                    objectMapper.writeValueAsString(tempTravelPlanGeminiResponse),
                                     retry
                             );
 
-                            List<TravelPlanGeminiResponse.Days.Places> retryPlaces =
+                            List<TempTravelPlanGeminiResponse.Days.Places> retryPlaces =
                                     objectMapper.readValue(newRecommendationJson, new TypeReference<>() {});
                             if (!retryPlaces.isEmpty()) {
                                 currentPlace = retryPlaces.get(0);
@@ -139,7 +139,7 @@ public class TravelPlanAiMatchingService {
                 log.info("----------------------------------------------------");
             }
 
-            TravelPlanGeminiResponse.Days updatedDay = new TravelPlanGeminiResponse.Days(
+            TempTravelPlanGeminiResponse.Days updatedDay = new TempTravelPlanGeminiResponse.Days(
                     day.date(),
                     day.start_time(),
                     day.end_time(),
@@ -149,9 +149,9 @@ public class TravelPlanAiMatchingService {
             updatedDays.add(updatedDay);
         }
 
-        TravelPlanGeminiResponse updatedResponse = new TravelPlanGeminiResponse(
-                travelPlanGeminiResponse.start_date(),
-                travelPlanGeminiResponse.end_date(),
+        TempTravelPlanGeminiResponse updatedResponse = new TempTravelPlanGeminiResponse(
+                tempTravelPlanGeminiResponse.start_date(),
+                tempTravelPlanGeminiResponse.end_date(),
                 updatedDays
         );
 

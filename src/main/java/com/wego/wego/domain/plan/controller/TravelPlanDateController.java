@@ -1,7 +1,7 @@
 package com.wego.wego.domain.plan.controller;
 
-import com.wego.wego.domain.plan.dto.TravelDateRequest;
-import com.wego.wego.domain.plan.dto.TravelTimeRequest;
+import com.wego.wego.domain.plan.dto.TempTravelDateRequest;
+import com.wego.wego.domain.plan.dto.TempTravelTimeRequest;
 import com.wego.wego.domain.plan.service.TravelPlanDateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +19,11 @@ public class TravelPlanDateController {
     private final TravelPlanDateService travelPlanDateService;
 
     @PostMapping("/temp/schedule/{uuid}")
-    public void createTempScheduleDate(@PathVariable  String uuid, @RequestBody TravelDateRequest travelDateRequest) {
-        if (travelDateRequest == null) {
+    public void createTempScheduleDate(@PathVariable  String uuid, @RequestBody TempTravelDateRequest tempTravelDateRequest) {
+        if (tempTravelDateRequest == null) {
             log.info("travelDateRequest null");
         }
-        travelPlanDateService.saveTempScheduleDate(uuid, travelDateRequest);
+        travelPlanDateService.saveTempScheduleDate(uuid, tempTravelDateRequest);
     }
     @GetMapping("/temp/schedule/{uuid}")
     public ResponseEntity<String> getTempScheduleDate(@PathVariable  String uuid) {
@@ -32,8 +32,8 @@ public class TravelPlanDateController {
     }
 
     @PostMapping("/temp/schedule/times/{uuid}")
-    public void createTempScheduleTimes(@PathVariable  String uuid, @RequestBody TravelTimeRequest travelTimeRequest) {
-        travelPlanDateService.saveTempScheduleTime(uuid, travelTimeRequest);
+    public void createTempScheduleTimes(@PathVariable  String uuid, @RequestBody TempTravelTimeRequest tempTravelTimeRequest) {
+        travelPlanDateService.saveTempScheduleTime(uuid, tempTravelTimeRequest);
     }
     @GetMapping("/temp/schedule/times/{uuid}")
     public ResponseEntity<String> getTempScheduleTimes(@PathVariable  String uuid) {
