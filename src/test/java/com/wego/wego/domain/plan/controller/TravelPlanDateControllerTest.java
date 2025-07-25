@@ -38,7 +38,7 @@ class TravelPlanDateControllerTest {
     private final String UUID = "Test-uuid-123";
 
     @Test
-    void createScheduleDate() throws Exception {
+    void createTempScheduleDate() throws Exception {
         TravelDateRequest travelDateRequest = new TravelDateRequest(
                 LocalDate.of(2025, 8, 1),
                 LocalDate.of(2025, 8, 3)
@@ -50,7 +50,7 @@ class TravelPlanDateControllerTest {
     }
 
     @Test
-    void getScheduleDate() throws Exception {
+    void getTempScheduleDate() throws Exception {
         MvcResult result = mockMvc.perform(get("/travel_plan/date/temp/schedule/" + UUID))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -59,7 +59,7 @@ class TravelPlanDateControllerTest {
 
 
     @Test
-    void createScheduleTimes() throws Exception {
+    void createTempScheduleTimes() throws Exception {
         TravelTimeRequest travelTimeRequest = new TravelTimeRequest(
                 List.of(
                         new TravelTimeRequest.TravelDayTimes(LocalDate.of(2025, 8, 1), LocalTime.of(10,0),LocalTime.of(20,0)),
@@ -74,7 +74,7 @@ class TravelPlanDateControllerTest {
     }
 
     @Test
-    void getScheduleTimes() throws Exception {
+    void getTempScheduleTimes() throws Exception {
         MvcResult result = mockMvc.perform(get("/travel_plan/date/temp/schedule/times/" + UUID))
                 .andExpect(status().isOk())
                 .andReturn();

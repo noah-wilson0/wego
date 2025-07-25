@@ -1,6 +1,5 @@
 package com.wego.wego.domain.plan.controller;
 
-import com.wego.wego.domain.plan.service.GeminiRequestService;
 import com.wego.wego.domain.plan.service.TravelPlanAiMatchingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,8 @@ public class TravelPlanAutoController {
     private final TravelPlanAiMatchingService travelPlanAiMatchingService;
 
     @PostMapping("/temp/sechedule/auto/{uuid}")
-    public ResponseEntity<?> AutoTravelPlan(@PathVariable String uuid) {
-        travelPlanAiMatchingService.autoTravelPlan(uuid);
+    public ResponseEntity<?> AutoTempTravelPlan(@PathVariable String uuid) {
+        travelPlanAiMatchingService.autoTempTravelPlan(uuid);
         return ResponseEntity.ok().body("성공");
     }
 }

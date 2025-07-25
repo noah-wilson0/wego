@@ -121,7 +121,7 @@ public class PlaceFetchService {
             String typeCode = item.getContenttypeid();
             String finalType;
             if ("39".equals(typeCode)) {
-                finalType = "A05020300".equals(item.getCat3()) ?
+                finalType = "A05020900".equals(item.getCat3()) ?
                         PlaceType.CAFE.getCode() : PlaceType.RESTAURANT.getCode();
             } else if ("32".equals(typeCode)) {
                 finalType = PlaceType.ACCOMMODATION.getCode();

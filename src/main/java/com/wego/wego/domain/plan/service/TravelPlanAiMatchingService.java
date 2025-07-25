@@ -40,7 +40,7 @@ public class TravelPlanAiMatchingService {
     static final int MAX_RETRY = 5;
 
 
-    public void autoTravelPlan(String uuid) {
+    public void autoTempTravelPlan(String uuid) {
         log.info("🚀 여행 일정 자동 생성 시작 - UUID: {}", uuid);
 
         String result = geminiRequestService.getGeminiTravelPlan(uuid);

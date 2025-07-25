@@ -69,7 +69,7 @@ class TravelPlanAutoControllerTest {
     private GeminiRequestService geminiRequestService;
 
     @Test
-    void autoTravelPlan() throws Exception {
+    void autoTempTravelPlan() throws Exception {
         mockMvc.perform(post("/travel_plan/recommend/temp/sechedule/auto/" + UUID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -114,7 +114,7 @@ class TravelPlanAutoControllerTest {
      */
     @DisplayName("Ai 추천 일정 및 DB 데이터 매칭 여부 테스트 1")
 //    @Test
-    void autoTravelPlanV1() throws Exception {
+    void autoTempTravelPlanV1() throws Exception {
 
         travelPlanGeminiResponse.days().stream().forEach(
                 day -> {
@@ -169,7 +169,7 @@ class TravelPlanAutoControllerTest {
      */
 //    @Test
     @DisplayName("지역 필터(city_code_id)와 함께 similarity 검색 - Gemini 재시도 포함")
-    void autoTravelPlanV3() {
+    void autoTempTravelPlanV3() {
         log.info("시작");
 
         final int MAX_RETRY = 5;
@@ -256,7 +256,7 @@ class TravelPlanAutoControllerTest {
 
     @Test
     @DisplayName("지역 필터(city_code_id)와 함께 similarity 검색 - Gemini 재시도 포함")
-    void autoTravelPlanV2() {
+    void autoTempTravelPlanV2() {
         log.info("시작");
 
         final int MAX_RETRY = 5;

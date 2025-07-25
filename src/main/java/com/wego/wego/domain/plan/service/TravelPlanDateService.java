@@ -19,7 +19,7 @@ public class TravelPlanDateService {
     private final RedisTemplate<String,String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public void saveScheduleDate(String uuid,TravelDateRequest travelDateRequest) {
+    public void saveTempScheduleDate(String uuid, TravelDateRequest travelDateRequest) {
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.dateKey(uuid),objectMapper.writeValueAsString(travelDateRequest),6, TimeUnit.HOURS);
         } catch (JsonProcessingException e) {
@@ -27,7 +27,7 @@ public class TravelPlanDateService {
             throw new RuntimeException(e);
         }
     }
-    public String getScheduleDate(String uuid) {
+    public String getTempScheduleDate(String uuid) {
         String scheduleDate = redisTemplate.opsForValue().get(RedisKeyUtils.dateKey(uuid));
 
         if (scheduleDate == null) {
@@ -35,7 +35,7 @@ public class TravelPlanDateService {
         }
         return scheduleDate;
     }
-    public void saveScheduleTime(String uuid, TravelTimeRequest travelTimeRequest) {
+    public void saveTempScheduleTime(String uuid, TravelTimeRequest travelTimeRequest) {
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.timeKey(uuid),objectMapper.writeValueAsString(travelTimeRequest),6, TimeUnit.HOURS);
         } catch (JsonProcessingException e) {
@@ -43,7 +43,7 @@ public class TravelPlanDateService {
             throw new RuntimeException(e);
         }
     }
-    public String getScheduleTime(String uuid) {
+    public String getTempScheduleTime(String uuid) {
         String scheduleDate = redisTemplate.opsForValue().get(RedisKeyUtils.timeKey(uuid));
 
         if (scheduleDate == null) {

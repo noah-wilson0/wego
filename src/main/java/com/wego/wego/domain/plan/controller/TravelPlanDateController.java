@@ -19,25 +19,25 @@ public class TravelPlanDateController {
     private final TravelPlanDateService travelPlanDateService;
 
     @PostMapping("/temp/schedule/{uuid}")
-    public void createScheduleDate(@PathVariable  String uuid, @RequestBody TravelDateRequest travelDateRequest) {
+    public void createTempScheduleDate(@PathVariable  String uuid, @RequestBody TravelDateRequest travelDateRequest) {
         if (travelDateRequest == null) {
             log.info("travelDateRequest null");
         }
-        travelPlanDateService.saveScheduleDate(uuid, travelDateRequest);
+        travelPlanDateService.saveTempScheduleDate(uuid, travelDateRequest);
     }
     @GetMapping("/temp/schedule/{uuid}")
-    public ResponseEntity<String> getScheduleDate(@PathVariable  String uuid) {
-        String scheduleDate = travelPlanDateService.getScheduleDate(uuid);
+    public ResponseEntity<String> getTempScheduleDate(@PathVariable  String uuid) {
+        String scheduleDate = travelPlanDateService.getTempScheduleDate(uuid);
         return ResponseEntity.ok(scheduleDate);
     }
 
     @PostMapping("/temp/schedule/times/{uuid}")
-    public void createScheduleTimes(@PathVariable  String uuid, @RequestBody TravelTimeRequest travelTimeRequest) {
-        travelPlanDateService.saveScheduleTime(uuid, travelTimeRequest);
+    public void createTempScheduleTimes(@PathVariable  String uuid, @RequestBody TravelTimeRequest travelTimeRequest) {
+        travelPlanDateService.saveTempScheduleTime(uuid, travelTimeRequest);
     }
     @GetMapping("/temp/schedule/times/{uuid}")
-    public ResponseEntity<String> getScheduleTimes(@PathVariable  String uuid) {
-        String scheduleTime = travelPlanDateService.getScheduleTime(uuid);
+    public ResponseEntity<String> getTempScheduleTimes(@PathVariable  String uuid) {
+        String scheduleTime = travelPlanDateService.getTempScheduleTime(uuid);
         return ResponseEntity.ok(scheduleTime);
     }
 }
