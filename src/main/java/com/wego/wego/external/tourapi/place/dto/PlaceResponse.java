@@ -30,6 +30,7 @@ public class PlaceResponse {
         private String addr1;
         private String addr2;
         private String areacode;
+        private String cat3;
         private String contentid;
         private String firstimage;
         private String mapx; //경도

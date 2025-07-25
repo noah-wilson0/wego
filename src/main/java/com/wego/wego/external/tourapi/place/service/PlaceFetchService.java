@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,15 +27,17 @@ import static org.apache.logging.log4j.util.Strings.isEmpty;
 @Service
 public class PlaceFetchService {
 
-
     private final WebClient webClient;
     private final TourApiProperties tourApiProperties;
     private final AreaCodeService areaCodeService;
     private final CityCodeService cityCodeService;
     private final PlaceService placeService;
 
-    public PlaceFetchService(@Qualifier("tourApiWebClient")WebClient webClient, TourApiProperties tourApiProperties, AreaCodeService areaCodeService,
-                            CityCodeService cityCodeService, PlaceService placeService) {
+    public PlaceFetchService(@Qualifier("tourApiWebClient") WebClient webClient,
+                             TourApiProperties tourApiProperties,
+                             AreaCodeService areaCodeService,
+                             CityCodeService cityCodeService,
+                             PlaceService placeService) {
         this.webClient = webClient;
         this.tourApiProperties = tourApiProperties;
         this.areaCodeService = areaCodeService;
@@ -45,15 +45,14 @@ public class PlaceFetchService {
         this.placeService = placeService;
     }
 
-
     @Transactional
     public void fetchPlace() {
-        List<String> placeTypes = PlaceType.getPlaceTypes();
-        for (String placeType : placeTypes) {
+        List<String> targetTypes = List.of("12", "14", "15", "32", "38", "39");
+        for (String placeType : targetTypes) {
             PlaceResponse placeResponse = getPlaceItemsFromApi(placeType);
             if (placeResponse != null && placeResponse.getResponse() != null) {
-                List<PlaceResponse.PlaceItem> tourSpotItems = placeResponse.getResponse().getBody().getItems().getItem();
-                tourSpotItemsToDB(tourSpotItems);
+                List<PlaceResponse.PlaceItem> items = placeResponse.getResponse().getBody().getItems().getItem();
+                tourSpotItemsToDB(items);
             }
         }
     }
@@ -91,87 +90,81 @@ public class PlaceFetchService {
                 .stream()
                 .collect(Collectors.groupingBy(cityCode -> cityCode.getAreaCode().getAreaCode()));
 
-        for (PlaceResponse.PlaceItem placeItem : placeItems) {
+        for (PlaceResponse.PlaceItem item : placeItems) {
 
-            if (isEmpty(placeItem.getAreacode())) {
-                log.warn("지역코드가 없어서 저장하지 않습니다. title={}", placeItem.getTitle());
+            if (isEmpty(item.getAreacode()) || isEmpty(item.getSigungucode())) {
+                log.warn("지역코드 또는 시군구코드 누락 title={}", item.getTitle());
                 continue;
             }
 
-            if (isEmpty(placeItem.getSigungucode())) {
-                log.warn("시군구코드가 없어서 저장하지 않습니다. title={}", placeItem.getTitle());
-                continue;
-            }
+            log.info(item.toString());
 
-            log.info(placeItem.toString());
-
-            Place existingPlace = existingPlaces.get(placeItem.getContentid());
-            AreaCode areaCode = areaCodeMap.get(placeItem.getAreacode());
-            CityCode cityCode = cityCodeMap.getOrDefault(placeItem.getAreacode(), List.of())
+            Place existingPlace = existingPlaces.get(item.getContentid());
+            AreaCode areaCode = areaCodeMap.get(item.getAreacode());
+            CityCode cityCode = cityCodeMap.getOrDefault(item.getAreacode(), List.of())
                     .stream()
-                    .filter(filtercityCode -> filtercityCode.getCityCode().equals(placeItem.getSigungucode()))
+                    .filter(code -> code.getCityCode().equals(item.getSigungucode()))
                     .findFirst()
                     .orElse(null);
 
             if (areaCode == null || cityCode == null) {
-                log.warn("AreaCode 또는 CityCode를 찾을 수 없습니다. title={}", placeItem.getTitle());
+                log.warn("AreaCode 또는 CityCode를 찾을 수 없습니다. title={}", item.getTitle());
                 continue;
             }
 
+            String rawTel = item.getTel();
+            if (rawTel != null && rawTel.length() > 50) {
+                rawTel = extractPhoneNumber(rawTel);
+                item.changeTel(rawTel);
+            }
+
+            String typeCode = item.getContenttypeid();
+            String finalType;
+            if ("39".equals(typeCode)) {
+                finalType = "A05020300".equals(item.getCat3()) ?
+                        PlaceType.CAFE.getCode() : PlaceType.RESTAURANT.getCode();
+            } else if ("32".equals(typeCode)) {
+                finalType = PlaceType.ACCOMMODATION.getCode();
+            } else {
+                finalType = PlaceType.TOURIST_SPOT.getCode();
+            }
+
             if (existingPlace != null) {
-                String cleanTel= placeItem.getTel();
-                if (cleanTel != null && cleanTel.length() > 50) {
-                    cleanTel= extractPhoneNumber(placeItem.getTel());
-                }
-                if (!isEquals(placeItem, existingPlace)) {
+                if (!isEquals(item, existingPlace)) {
                     existingPlace.changeExceptAverageRatingAndLikeCount(
-                            placeItem.getContentid(), placeItem.getTitle(),
-                            cityCode, PlaceType.fromCode(placeItem.getContenttypeid()).getCode(),
-                            placeItem.getAddr1(), placeItem.getAddr2(), placeItem.getFirstimage(),
-                            placeItem.getMapx(), placeItem.getMapy(), cleanTel
+                            item.getContentid(), item.getTitle(),
+                            cityCode, finalType,
+                            item.getAddr1(), item.getAddr2(), item.getFirstimage(),
+                            item.getMapx(), item.getMapy(), item.getTel()
                     );
                 }
             } else {
-                if (placeItem.getTel() != null && placeItem.getTel().length() > 50) {
-                    placeItem.changeTel(extractPhoneNumber(placeItem.getTel()));
-                }
                 placeService.save(Place.builder()
                         .id(null)
-                        .contentId(placeItem.getContentid())
-                        .title(placeItem.getTitle())
+                        .contentId(item.getContentid())
+                        .title(item.getTitle())
                         .cityCode(cityCode)
-                        .placeType(PlaceType.fromCode(placeItem.getContenttypeid()).getCode())
-                        .addr1(placeItem.getAddr1())
-                        .addr2(placeItem.getAddr2())
-                        .image(placeItem.getFirstimage())
-                        .longitude(placeItem.getMapx())
-                        .latitude(placeItem.getMapy())
-                        .tel(placeItem.getTel())
+                        .placeType(finalType)
+                        .addr1(item.getAddr1())
+                        .addr2(item.getAddr2())
+                        .image(item.getFirstimage())
+                        .longitude(item.getMapx())
+                        .latitude(item.getMapy())
+                        .tel(item.getTel())
                         .build());
             }
         }
     }
 
-    private boolean isEquals(PlaceResponse.PlaceItem placeItem, Place place) {
-        return Objects.equals(placeItem.getContentid(), place.getContentId())
-                && Objects.equals(placeItem.getTitle(), place.getTitle())
-                && Objects.equals(placeItem.getAreacode(),
-                areaCodeService.findByAreaCode(
-                                cityCodeService.findAreaCodeByCityCodeAndAreaCodeId(
-                                                place.getCityCode().getCityCode(),
-                                                place.getCityCode().getAreaCode().getAreaCodeId()
-                                        ).orElseThrow(() -> new IllegalArgumentException("AreaCode not found"))
-                                        .getAreaCode()
-                        ).orElseThrow(() -> new IllegalArgumentException("AreaCode not found"))
-                        .getAreaCode()
-        )
-                && Objects.equals(placeItem.getAddr1(), place.getAddr1())
-                && Objects.equals(placeItem.getAddr2(), place.getAddr2())
-                && Objects.equals(placeItem.getFirstimage(), place.getImage())
-                && Objects.equals(placeItem.getMapx(), place.getLongitude())
-                && Objects.equals(placeItem.getMapy(), place.getLatitude())
-                && Objects.equals(placeItem.getTel(), place.getTel());
-
+    private boolean isEquals(PlaceResponse.PlaceItem item, Place place) {
+        return Objects.equals(item.getContentid(), place.getContentId()) &&
+                Objects.equals(item.getTitle(), place.getTitle()) &&
+                Objects.equals(item.getAddr1(), place.getAddr1()) &&
+                Objects.equals(item.getAddr2(), place.getAddr2()) &&
+                Objects.equals(item.getFirstimage(), place.getImage()) &&
+                Objects.equals(item.getMapx(), place.getLongitude()) &&
+                Objects.equals(item.getMapy(), place.getLatitude()) &&
+                Objects.equals(item.getTel(), place.getTel());
     }
 
     public String extractPhoneNumber(String telRaw) {
@@ -180,4 +173,3 @@ public class PlaceFetchService {
         return matcher.find() ? matcher.group() : null;
     }
 }
-
