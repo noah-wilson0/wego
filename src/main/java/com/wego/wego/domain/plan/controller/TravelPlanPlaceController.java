@@ -39,6 +39,7 @@ public class TravelPlanPlaceController {
         travelPlanPlaceService.saveTempSchedulePlace(uuid, tempTravelPlanPlaceRequests);
         return ResponseEntity.ok().build();
     }
+
     @PostMapping("/temp/schedule/{uuid}/accommodation")
     public ResponseEntity<?> createTempAccommodation(@PathVariable String uuid, @RequestBody List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests){
         travelPlanPlaceService.saveTempScheduleAccommodation(uuid, tempTravelPlanAccommodationRequests);

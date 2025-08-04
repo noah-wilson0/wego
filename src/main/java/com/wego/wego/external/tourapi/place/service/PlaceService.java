@@ -35,6 +35,9 @@ public class PlaceService {
     public Optional<Place> findByContentId(String contentId) {
         return placeRepository.findByContentId(contentId);
     }
+    public List<Place> findByContentIdIn(List<String> contentIds) {
+        return placeRepository.findByContentIdIn(contentIds);
+    }
 
     public Place findByTitle(String title) {
         return placeRepository.findByTitle(title);

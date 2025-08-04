@@ -24,9 +24,14 @@ public class RedisKeyUtils {
         return String.format("%s:%s:accommodations", SCHEDULE_BASE_PREFIX, uuid);
     }
 
-    // 경로 정보 저장 키 (ex: 자동차 or 대중교통 구분 필요 시 routeType 추가 가능)
-    public static String routeKey(String uuid) {
-        return String.format("%s:%s:route", SCHEDULE_BASE_PREFIX, uuid);
+    // 자동차 경로 정보 저장 키
+    public static String routeCarKey(String uuid) {
+        return String.format("%s:%s:route:car", SCHEDULE_BASE_PREFIX, uuid);
+    }
+
+    // 대중교통 경로 정보 저장 키
+    public static String routeTransitKey(String uuid) {
+        return String.format("%s:%s:route:transit", SCHEDULE_BASE_PREFIX, uuid);
     }
 
     // 자동 추천 결과 저장 키

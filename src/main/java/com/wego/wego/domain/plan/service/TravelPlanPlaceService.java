@@ -44,11 +44,13 @@ public class TravelPlanPlaceService {
     public void saveTempSchedulePlace(String uuid, List<TempTravelPlanPlaceRequest> tempSchedulePlaceRequests) {
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.placesKey(uuid), objectMapper.writeValueAsString(tempSchedulePlaceRequests));
+            log.info(redisTemplate.opsForValue().get(RedisKeyUtils.placesKey(uuid)));
         } catch (JsonProcessingException e) {
             log.info("임시 여행 장소 리스트 저장 실패");
             throw new RuntimeException(e);
         }
     }
+
     public void saveTempScheduleAccommodation(String uuid, List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests) {
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), objectMapper.writeValueAsString(tempTravelPlanAccommodationRequests));

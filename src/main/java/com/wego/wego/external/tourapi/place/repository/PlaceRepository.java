@@ -15,6 +15,7 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     Place findByTitle(String title);
     List<Place> findAllByContentIdIn(List<String> contentIds);
     Optional<Place> findByContentId(String contentId);
+    List<Place> findByContentIdIn(List<String> contentIds);
 
     @Query(value = """
     SELECT *
