@@ -75,8 +75,8 @@ class TravelPlanPlaceControllerTest {
     void savePlaces() throws Exception {
         List<TempTravelPlanPlaceRequest> places = List.of(
                 new TempTravelPlanPlaceRequest("129921"),
-                new TempTravelPlanPlaceRequest("2918695")
-//                new TempTravelPlanPlaceRequest("3307514"),
+                new TempTravelPlanPlaceRequest("2918695"),
+                new TempTravelPlanPlaceRequest("3307514")
 //                new TempTravelPlanPlaceRequest("2894178"),
 //                new TempTravelPlanPlaceRequest("2930998"), ///
 //                new TempTravelPlanPlaceRequest("2924803"),
@@ -104,7 +104,7 @@ class TravelPlanPlaceControllerTest {
         TempTravelTimeRequest tempTravelTimeRequest = objectMapper.readValue(times, TempTravelTimeRequest.class);
         List<TempTravelPlanAccommodationRequest> accommodation = new ArrayList<>();
 
-        for (int i = 0; i < tempTravelTimeRequest.travelDayTimes().size(); i++) {
+        for (int i = 0; i < tempTravelTimeRequest.travelDayTimes().size()-1; i++) {
             accommodation.add(new TempTravelPlanAccommodationRequest(tempTravelTimeRequest.travelDayTimes().get(i).date(),
                     "2574118"));
         }

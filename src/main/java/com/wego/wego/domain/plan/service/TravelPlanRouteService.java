@@ -89,7 +89,7 @@ public class TravelPlanRouteService {
 
             // 숙소 추가
             Place accommodationPlace = null;
-            if (date.equals(tempTravelPlanAccommodationRequests.get(i).date())) {
+            if (i<totalDays-1 && date.equals(tempTravelPlanAccommodationRequests.get(i).date())) {
                 accommodationPlace = placeMap.get(tempTravelPlanAccommodationRequests.get(i).contentId());
                 placesInDay.add(accommodationPlace); // 숙소 맨 뒤 추가
             }
