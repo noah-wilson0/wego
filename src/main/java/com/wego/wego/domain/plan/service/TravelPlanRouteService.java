@@ -171,7 +171,14 @@ public class TravelPlanRouteService {
 
         try {
             route = objectMapper.writeValueAsString(schedule);
-            redisTemplate.opsForValue().set(RedisKeyUtils.routeCarKey(uuid), route);
+            switch (route_type) {
+                case "car" -> {
+                    redisTemplate.opsForValue().set(RedisKeyUtils.routeCarKey(uuid), route);
+                }
+                case "transit" -> {
+                    redisTemplate.opsForValue().set(RedisKeyUtils.routeTransitKey(uuid), route);
+                }
+            }
         } catch (JsonProcessingException e) {
             log.info("경로 정보 redis 저장 실패");
             throw new RuntimeException(e);

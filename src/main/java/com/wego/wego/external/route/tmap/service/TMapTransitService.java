@@ -21,13 +21,10 @@ public class TMapTransitService {
     @Qualifier("TMapTransitWebClient")
     private final WebClient webClient;
 
-    private final TMapTransitProperties tMapTransitProperties;
-
     private final ObjectMapper objectMapper;
 
-    public TMapTransitService(@Qualifier("TMapTransitWebClient") WebClient webClient, TMapTransitProperties tMapTransitProperties, ObjectMapper objectMapper) {
+    public TMapTransitService(@Qualifier("TMapTransitWebClient") WebClient webClient, ObjectMapper objectMapper) {
         this.webClient = webClient;
-        this.tMapTransitProperties = tMapTransitProperties;
         this.objectMapper = objectMapper;
     }
 
@@ -73,7 +70,6 @@ public class TMapTransitService {
      */
     private TMapTransitResponse getTMapTransitFromApi(String req) {
 
-
         log.info("📨 요청 바디: {}", req);
 
         return webClient.post()
@@ -84,25 +80,6 @@ public class TMapTransitService {
                 .retrieve()
                 .bodyToMono(TMapTransitResponse.class)
                 .block();
-//        String responseBody = webClient.post()
-//                .uri(uriBuilder -> uriBuilder
-//                        .path("")
-//                        .build())
-//                .bodyValue(req)
-//                .retrieve()
-//                .bodyToMono(String.class)
-//                .block(); // 응답을 문자열로 먼저 받음
-//
-//        log.info("🧾 원본 응답 바디: {}", responseBody); // 👉 여기가 핵심
-// 이제 ObjectMapper로 매핑
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        TMapTransitResponse parsed = null;
-//        try {
-//            parsed = objectMapper.readValue(responseBody, TMapTransitResponse.class);
-//        } catch (JsonProcessingException e) {
-//            throw new RuntimeException(e);
-//        }
-//        return parsed;
     }
 
 }

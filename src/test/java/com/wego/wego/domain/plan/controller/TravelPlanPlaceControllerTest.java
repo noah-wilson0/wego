@@ -75,9 +75,9 @@ class TravelPlanPlaceControllerTest {
     void savePlaces() throws Exception {
         List<TempTravelPlanPlaceRequest> places = List.of(
                 new TempTravelPlanPlaceRequest("129921"),
-                new TempTravelPlanPlaceRequest("2918695"),
-                new TempTravelPlanPlaceRequest("3307514")
-//                new TempTravelPlanPlaceRequest("2894178"),
+//                new TempTravelPlanPlaceRequest("2918695"),
+                new TempTravelPlanPlaceRequest("3307514"),
+                new TempTravelPlanPlaceRequest("2894178")
 //                new TempTravelPlanPlaceRequest("2930998"), ///
 //                new TempTravelPlanPlaceRequest("2924803"),
 //                new TempTravelPlanPlaceRequest("264570"),
