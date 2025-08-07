@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -51,13 +52,19 @@ public class TravelPlanPlaceService {
         }
     }
 
-    public void saveTempScheduleAccommodation(String uuid, List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests) {
+    public void saveTempScheduleAccommodation(String uuid, List<TempTravelPlanAccommodationRequest> requests) {
+        List<TempTravelPlanAccommodationRequest> filtered = requests.stream()
+                .filter(req -> req.contentId() != null && !req.contentId().isBlank())
+                .collect(Collectors.toList());
+        String result=null;
         try {
-            redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), objectMapper.writeValueAsString(tempTravelPlanAccommodationRequests));
+            result = objectMapper.writeValueAsString(filtered);
         } catch (JsonProcessingException e) {
-            log.info("임시 여행 숙소 리스트 저장 실패");
             throw new RuntimeException(e);
         }
+        // filtered 리스트만 Redis 저장
+        redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), result);
     }
+
 
 }
