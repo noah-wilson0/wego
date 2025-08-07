@@ -24,14 +24,9 @@ public class RedisKeyUtils {
         return String.format("%s:%s:accommodations", SCHEDULE_BASE_PREFIX, uuid);
     }
 
-    // 자동차 경로 정보 저장 키
-    public static String routeCarKey(String uuid) {
-        return String.format("%s:%s:route:car", SCHEDULE_BASE_PREFIX, uuid);
-    }
-
     // 대중교통 경로 정보 저장 키
-    public static String routeTransitKey(String uuid) {
-        return String.format("%s:%s:route:transit", SCHEDULE_BASE_PREFIX, uuid);
+    public static String routeKey(String uuid) {
+        return String.format("%s:%s:route", SCHEDULE_BASE_PREFIX, uuid);
     }
 
     // 자동 추천 결과 저장 키
@@ -39,10 +34,11 @@ public class RedisKeyUtils {
         return String.format("%s:%s:recommend", SCHEDULE_BASE_PREFIX, uuid);
     }
 
-    // 특정 추천 카드 ID로 저장할 경우 (선택사항)
-    public static String recommendKey(String uuid, String cardId) {
-        return String.format("%s:%s:recommend:%s", SCHEDULE_BASE_PREFIX, uuid, cardId);
+    // 임시 여행 일정 조회 키
+    public static String tempScheduleKey(String uuid) {
+        return String.format("%s:%s:temp", SCHEDULE_BASE_PREFIX, uuid);
     }
+
 
     // 전체 prefix 반환 (디버깅, keys 조회용)
     public static String allSchedulePrefix() {
