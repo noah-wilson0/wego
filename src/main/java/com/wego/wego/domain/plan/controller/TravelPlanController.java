@@ -4,10 +4,7 @@ import com.wego.wego.domain.plan.service.TravelPlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -29,11 +26,18 @@ public class TravelPlanController {
         return ResponseEntity.ok().body(tempTravelPlan);
 
     }
+
     /**
+     * TODO : 로그인 구현 후 시작하기
      * 저장 버튼 눌릴시 DB에 임시 여행일정 json을 db화
+     * 하기 위해선 로그인이 되어야 한다.
      */
+    @PostMapping("schedule/{uuid}")
+    public ResponseEntity<Void> saveTravelPlan(@PathVariable String uuid) {
 
 
+        return ResponseEntity.ok().build();
+    }
     /**
      * 임시 조회 화면에서 저장을 눌릴시 db에 여행 일정이 저장되므로 db에서 읽는 것이 일반 조회
      * @param uuid

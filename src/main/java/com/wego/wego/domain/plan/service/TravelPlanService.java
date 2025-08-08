@@ -3,12 +3,10 @@ package com.wego.wego.domain.plan.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.TempTravelPlanResponse;
-import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
 import com.wego.wego.domain.plan.dto.TravelPlanRouteJson;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.util.RedisKeyUtils;
-import jakarta.validation.constraints.DecimalMax;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -123,6 +121,17 @@ public class TravelPlanService {
         redisTemplate.opsForValue().set(RedisKeyUtils.tempScheduleKey(uuid), response);
 
         return response;
+    }
+
+    public void persistTravelPlan(String uuid) {
+        String json = redisTemplate.opsForValue().get(RedisKeyUtils.tempScheduleKey(uuid));
+        TempTravelPlanResponse tempTravelPlanResponse;
+        try {
+            tempTravelPlanResponse = objectMapper.readValue(json, TempTravelPlanResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }
