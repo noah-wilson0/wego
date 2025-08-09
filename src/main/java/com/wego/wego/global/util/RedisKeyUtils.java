@@ -39,6 +39,14 @@ public class RedisKeyUtils {
         return String.format("%s:%s:temp", SCHEDULE_BASE_PREFIX, uuid);
     }
 
+    public static String whiteListKey(String username) {
+        return String.format("wego:auth:whitelist:", username);
+    }
+
+    public static String blackListKey(String username) {
+        return String.format("wego:auth:blacklist:", username);
+    }
+
 
     // 전체 prefix 반환 (디버깅, keys 조회용)
     public static String allSchedulePrefix() {
