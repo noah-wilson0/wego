@@ -35,49 +35,59 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
             log.info("OPTIONS 요청 - 필터 우회");
             filterChain.doFilter(servletRequest, servletResponse);
+            return;
         }
 
-        // 필터를 적용하지 않을 경로 설정
-        if (path.startsWith("/members/sign-in") || path.startsWith("/members/sign-in/test") ||
-                path.startsWith("/members/signup")) {
+        if (
+                path.startsWith("/members/sign-in") ||
+                        path.startsWith("/members/signup") ||
+
+                        path.startsWith("/travel_plan/date") ||
+                        path.startsWith("/travel_plan/place") ||
+                        path.startsWith("/travel_plan/route") ||
+                        path.equals("/travel_plan/recommend") ||
+                        path.startsWith("/travel_plan/recommend") ||
+                        path.startsWith("/travel_plan/temp/schedule")
+        ) {
+            log.info("permitAll한 요청");
             filterChain.doFilter(servletRequest, servletResponse);
             return;
-        }
+        } else {
 
-        //토큰 가져오기
-        if (httpRequest.getCookies() != null) {
-            for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
-                if ("accessToken".equals(cookie.getName())) {
-                    token=cookie.getValue();
+            //토큰 가져오기
+            if (httpRequest.getCookies() != null) {
+                for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
+                    if ("accessToken".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                    }
                 }
-            }
-        }else{
-            log.info("토큰 없음");
-            HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-            SecurityContextHolder.clearContext();
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.setContentType("application/json; charset=UTF-8");
-            httpResponse.getWriter().write("{\"error\": \"토큰이 없습니다.\"}");
-            return;
-        }
-        log.info("jwtProvider.getAuthentication(token).getName():{}",jwtProvider.getAuthentication(token).getName());
-        // AT 블랙리스트검사
-        if (token != null && jwtProvider.validateToken(token)) {
-            if (redisTemplate.hasKey(RedisKeyUtils.blackListKey(jwtProvider.getAuthentication(token).getName()))) {
-                log.info("blacklist 확인 실행");
+            } else {
+                log.info("토큰 없음");
                 HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
                 SecurityContextHolder.clearContext();
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setContentType("application/json; charset=UTF-8");
-                httpResponse.getWriter().write("{\"error\": \"블랙리스트에 등록된 토큰입니다. 재로그인 필요\"}");
+                httpResponse.getWriter().write("{\"error\": \"토큰이 없습니다.\"}");
                 return;
             }
-            else{
-                log.info("유효성 검사");
-                Authentication authentication = jwtProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // AT 블랙리스트검사
+            if (token != null && jwtProvider.validateToken(token)) {
+                if (redisTemplate.hasKey(RedisKeyUtils.blackListKey(jwtProvider.getAuthentication(token).getName()))) {
+                    log.info("blacklist 확인 실행");
+                    HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+                    SecurityContextHolder.clearContext();
+                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    httpResponse.setContentType("application/json; charset=UTF-8");
+                    httpResponse.getWriter().write("{\"error\": \"블랙리스트에 등록된 토큰입니다. 재로그인 필요\"}");
+                    return;
+                } else {
+                    log.info("유효성 검사");
+                    Authentication authentication = jwtProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
+            filterChain.doFilter(servletRequest, servletResponse);
         }
-        filterChain.doFilter(servletRequest, servletResponse);
     }
 }

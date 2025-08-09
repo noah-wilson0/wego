@@ -20,7 +20,7 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("travel_plan/place")
+@RequestMapping("/travel_plan/place")
 @RequiredArgsConstructor
 public class TravelPlanPlaceController {
 

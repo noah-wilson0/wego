@@ -40,7 +40,7 @@ public class RedisKeyUtils {
     }
 
     public static String whiteListKey(String username) {
-        return String.format("wego:auth:whitelist:", username);
+        return String.format("wego:auth:whitelist:%s", username);
     }
 
     public static String blackListKey(String username) {

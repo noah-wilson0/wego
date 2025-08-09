@@ -13,6 +13,6 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<String> getMember(@AuthenticationPrincipal Member member) {
-        return ResponseEntity.ok().body(member.getUsername());
+        return ResponseEntity.ok().body(member.getName());
     }
 }

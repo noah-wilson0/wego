@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("travel_plan/recommend")
+@RequestMapping("/travel_plan/recommend")
 @RequiredArgsConstructor
 public class TravelPlanAutoController {
     private final TravelPlanAiMatchingService travelPlanAiMatchingService;

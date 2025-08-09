@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping("travel_plan/route")
+@RequestMapping("/travel_plan/route")
 @RequiredArgsConstructor
 public class TravelPlanRouteController {
 

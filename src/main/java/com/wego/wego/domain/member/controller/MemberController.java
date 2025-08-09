@@ -5,6 +5,7 @@ import com.wego.wego.domain.member.dto.SignupRequest;
 import com.wego.wego.domain.member.service.MemberService;
 import com.wego.wego.global.security.JwtToken;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+@Slf4j
 @RequestMapping("/members")
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class MemberController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody SignInRequest signupRequest) {
+        log.info("signIn init");
         JwtToken jwtToken = memberService.signIn(signupRequest);
         ResponseCookie atCookie = ResponseCookie.from("accessToken", jwtToken.accessToken())
                 .httpOnly(true)

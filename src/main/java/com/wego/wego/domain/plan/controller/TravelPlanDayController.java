@@ -23,6 +23,7 @@ public class TravelPlanDayController {
         if (tempTravelDateRequest == null) {
             log.info("travelDateRequest null");
         }
+        log.info("createTempScheduleDate");
         travelPlanDayService.saveTempScheduleDate(uuid, tempTravelDateRequest);
     }
     @GetMapping("/temp/schedule/{uuid}")

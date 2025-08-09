@@ -15,11 +15,12 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TravelPlanDateService {
+public class TravelPlanDayService {
     private final RedisTemplate<String,String> redisTemplate;
     private final ObjectMapper objectMapper;
 
     public void saveTempScheduleDate(String uuid, TempTravelDateRequest tempTravelDateRequest) {
+        log.info("saveTempScheduleDate");
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.dateKey(uuid),objectMapper.writeValueAsString(tempTravelDateRequest),6, TimeUnit.HOURS);
         } catch (JsonProcessingException e) {
