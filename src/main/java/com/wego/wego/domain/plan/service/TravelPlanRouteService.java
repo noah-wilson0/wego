@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -171,7 +172,7 @@ public class TravelPlanRouteService {
 
         try {
             route = objectMapper.writeValueAsString(schedule);
-            redisTemplate.opsForValue().set(RedisKeyUtils.routeKey(uuid), route); //car,transit 어떤것이든 json안에 route_type이 존재하므로 key도 달리줄 필요는 없다. 조회 시점에 car,transit인지 모르기 때문에 이슈가 생김
+            redisTemplate.opsForValue().set(RedisKeyUtils.routeKey(uuid), route,6, TimeUnit.HOURS); //car,transit 어떤것이든 json안에 route_type이 존재하므로 key도 달리줄 필요는 없다. 조회 시점에 car,transit인지 모르기 때문에 이슈가 생김
         } catch (JsonProcessingException e) {
             log.info("경로 정보 redis 저장 실패");
             throw new RuntimeException(e);

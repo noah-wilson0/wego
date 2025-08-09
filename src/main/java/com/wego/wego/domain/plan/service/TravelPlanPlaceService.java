@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,7 +45,7 @@ public class TravelPlanPlaceService {
     }
     public void saveTempSchedulePlace(String uuid, List<TempTravelPlanPlaceRequest> tempSchedulePlaceRequests) {
         try {
-            redisTemplate.opsForValue().set(RedisKeyUtils.placesKey(uuid), objectMapper.writeValueAsString(tempSchedulePlaceRequests));
+            redisTemplate.opsForValue().set(RedisKeyUtils.placesKey(uuid), objectMapper.writeValueAsString(tempSchedulePlaceRequests),6, TimeUnit.HOURS);
             log.info(redisTemplate.opsForValue().get(RedisKeyUtils.placesKey(uuid)));
         } catch (JsonProcessingException e) {
             log.info("임시 여행 장소 리스트 저장 실패");
@@ -63,7 +64,7 @@ public class TravelPlanPlaceService {
             throw new RuntimeException(e);
         }
         // filtered 리스트만 Redis 저장
-        redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), result);
+        redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), result,6, TimeUnit.HOURS);
     }
 
 
