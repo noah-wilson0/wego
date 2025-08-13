@@ -26,11 +26,12 @@ public class TravelPlanPlaceController {
 
     private final TravelPlanPlaceService travelPlanPlaceService;
 
-    @GetMapping("/{placeType}/paged")
+    @GetMapping("/{areaSlug}/{placeType}/paged")
     public ResponseEntity<Page<TravelPlanPlaceResponse>> getPagedPlaces(
+            @PathVariable String areaSlug,
             @PathVariable String placeType,
             @PageableDefault(size=20, sort = {"averageRating", "likeCount"}, direction = Sort.Direction.DESC)Pageable pageable){
-        Page<TravelPlanPlaceResponse> travelPlanPlaceResponses = travelPlanPlaceService.findAll(placeType, pageable);
+        Page<TravelPlanPlaceResponse> travelPlanPlaceResponses = travelPlanPlaceService.findAll(areaSlug, placeType, pageable);
         return ResponseEntity.ok(travelPlanPlaceResponses);
     }
 

@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.TempTravelPlanAccommodationRequest;
 import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
 import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
+import com.wego.wego.domain.plan.repository.AreaSlugRepository;
+import com.wego.wego.domain.plan.repository.CitySlugRepository;
+import com.wego.wego.external.tourapi.location.repository.CityCodeRepository;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
 import com.wego.wego.global.enums.PlaceType;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -29,10 +33,17 @@ import java.util.stream.Collectors;
 public class TravelPlanPlaceService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
-    private final PlaceRepository placeRepository;
 
-    public Page<TravelPlanPlaceResponse> findAll(String placeType, Pageable pageable) {
-        return placeRepository.findByPlaceType(placeType, pageable)
+    private final AreaSlugRepository areaSlugRepository;
+    private final CitySlugRepository citySlugRepository;
+    private final PlaceRepository placeRepository;
+    private final CityCodeRepository cityCodeRepository;
+
+    public Page<TravelPlanPlaceResponse> findAll(String areaSlug, String placeType, Pageable pageable) {
+
+        List<Integer> cityIds = resolveCityIds(areaSlug);
+
+        return placeRepository.findByPlaceTypeAndCityCodeIdIn(placeType, cityIds, pageable)
                 .map(place -> TravelPlanPlaceResponse.builder()
                         .contentId(place.getContentId())
                         .title(place.getTitle())
@@ -43,6 +54,8 @@ public class TravelPlanPlaceService {
                         .likeCount(place.getLikeCount())
                         .build());
     }
+
+
     public void saveTempSchedulePlace(String uuid, List<TempTravelPlanPlaceRequest> tempSchedulePlaceRequests) {
         try {
             redisTemplate.opsForValue().set(RedisKeyUtils.placesKey(uuid), objectMapper.writeValueAsString(tempSchedulePlaceRequests),6, TimeUnit.HOURS);
@@ -65,6 +78,17 @@ public class TravelPlanPlaceService {
         }
         // filtered 리스트만 Redis 저장
         redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), result,6, TimeUnit.HOURS);
+    }
+
+    private List<Integer> resolveCityIds(String areaSlug) {
+        Optional<Integer> areaCodeIdBySlug = areaSlugRepository.findAreaCodeIdBySlug(areaSlug);
+
+        if (areaCodeIdBySlug != null) {
+            return cityCodeRepository.findCityCodeIdsByAreaCodeId(areaCodeIdBySlug.get());
+
+        } else {
+            return citySlugRepository.findCityCodeIdsBySlug(areaSlug);
+        }
     }
 
 

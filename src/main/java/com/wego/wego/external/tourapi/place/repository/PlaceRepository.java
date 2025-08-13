@@ -35,6 +35,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
 
     Page<Place> findByPlaceType(String placeType, Pageable pageable);
+    @Query("select p from Place p where p.placeType = :placeType and p.cityCode.cityCodeId in :cityCodeIds")
+    Page<Place> findByPlaceTypeAndCityCodeIdIn(String placeType, List<Integer> cityCodeIds, Pageable pageable);
+
 
 
 
