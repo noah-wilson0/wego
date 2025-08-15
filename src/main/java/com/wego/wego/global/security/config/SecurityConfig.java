@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
                         .requestMatchers("/members/sign-in","/members/signup",
                                 "/auth/me",
+                                "/chemi/result",
                                 "/travel_plan/date/**","/travel_plan/place/**",
                                 "/travel_plan/route/**","travel_plan/recommend",
                                 "/travel_plan/temp/schedule/**").permitAll()

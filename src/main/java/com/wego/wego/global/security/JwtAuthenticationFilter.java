@@ -40,14 +40,16 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
         if (
                 path.startsWith("/members/sign-in") ||
-                        path.startsWith("/members/signup") ||
+                path.startsWith("/members/signup") ||
 
-                        path.startsWith("/travel_plan/date") ||
-                        path.startsWith("/travel_plan/place") ||
-                        path.startsWith("/travel_plan/route") ||
-                        path.equals("/travel_plan/recommend") ||
-                        path.startsWith("/travel_plan/recommend") ||
-                        path.startsWith("/travel_plan/temp/schedule")
+                path.startsWith("/chemi/result") ||
+
+                path.startsWith("/travel_plan/date") ||
+                path.startsWith("/travel_plan/place") ||
+                path.startsWith("/travel_plan/route") ||
+                path.equals("/travel_plan/recommend") ||
+                path.startsWith("/travel_plan/recommend") ||
+                path.startsWith("/travel_plan/temp/schedule")
         ) {
             log.info("permitAll한 요청");
             filterChain.doFilter(servletRequest, servletResponse);

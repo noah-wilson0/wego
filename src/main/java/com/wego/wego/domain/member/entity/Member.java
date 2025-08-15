@@ -47,4 +47,10 @@ public class Member {
     @Builder.Default
     private LocalDate created_at=LocalDate.now();
 
+
+
+    public void updateChemiId(Long chemiId) {
+        this.chemiId=chemiId;
+    }
+
 }
