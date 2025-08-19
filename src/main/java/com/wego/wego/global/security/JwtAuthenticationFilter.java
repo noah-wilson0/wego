@@ -47,6 +47,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
                 path.startsWith("/images/chemi") ||
 
+                path.startsWith("/travel_plan/slug") ||
                 path.startsWith("/travel_plan/date") ||
                 path.startsWith("/travel_plan/place") ||
                 path.startsWith("/travel_plan/route") ||

@@ -22,6 +22,13 @@ public class TravelPlan {
     @Column(name = "travel_plan_id")
     private Long id;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "slug",nullable = false)
+//    private AreaSlug areaSlug;
+    /** 조회 전용 FK(DB: REFERENCES area_slug(slug)) */
+    @Column(name = "slug", nullable = false)
+    private String slug;
+
     @Column(name = "title", nullable = false)
     @Builder.Default
     private String title="";

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public record TravelPlanRouteJson(
+        String slug,
         LocalDate start_date,
         LocalDate end_date,
         List<DaySchedule> days,

@@ -11,10 +11,7 @@ import com.wego.wego.domain.plan.entity.TravelPlan;
 import com.wego.wego.domain.plan.entity.TravelPlanDay;
 import com.wego.wego.domain.plan.entity.TravelPlanPlace;
 import com.wego.wego.domain.plan.entity.TravelPlanRoute;
-import com.wego.wego.domain.plan.repository.TravelPlanDayRepository;
-import com.wego.wego.domain.plan.repository.TravelPlanPlaceRepository;
 import com.wego.wego.domain.plan.repository.TravelPlanRepository;
-import com.wego.wego.domain.plan.repository.TravelPlanRouteRepository;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.enums.PlaceType;
@@ -43,7 +40,9 @@ public class TravelPlanService {
     private final RedisTemplate<String,String > redisTemplate;
     private final ObjectMapper objectMapper;
 
-
+    public void saveTempSlug(String slug, String uuid) {
+        redisTemplate.opsForValue().set(RedisKeyUtils.slugKey(uuid), slug,6, TimeUnit.HOURS);
+    }
 
     public String getTempTravelPlan(String uuid) {
 
@@ -122,6 +121,7 @@ public class TravelPlanService {
         }
 
         TempTravelPlanResponse tempTravelPlanResponse=new TempTravelPlanResponse(
+                travelPlanRouteJson.slug(),
                 travelPlanRouteJson.start_date(),
                 travelPlanRouteJson.end_date(),
                 newDays,
@@ -156,6 +156,7 @@ public class TravelPlanService {
         // ↓ 이 managed를 쓰세요
         // 1) plan 만들기 (title, createdAt은 엔티티 default 활용)
         TravelPlan plan = TravelPlan.builder()
+                .slug(tempTravelPlanResponse.slug())
                 .startDate(tempTravelPlanResponse.start_date())
                 .endDate(tempTravelPlanResponse.end_date())
                 .member(managed)
@@ -273,6 +274,7 @@ public class TravelPlanService {
 
         // 6) 임시 키 삭제
         redisTemplate.delete(List.of(
+                RedisKeyUtils.slugKey(uuid),
                 RedisKeyUtils.dateKey(uuid),
                 RedisKeyUtils.timeKey(uuid),
                 RedisKeyUtils.placesKey(uuid),

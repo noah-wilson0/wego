@@ -5,6 +5,11 @@ public class RedisKeyUtils {
     private static final String SCHEDULE_BASE_PREFIX = "wego:schedule";
 
     // 여행 일정 날짜 저장 키
+    public static String slugKey(String uuid) {
+        return String.format("%s:%s:slug", SCHEDULE_BASE_PREFIX, uuid);
+    }
+
+    // 여행 일정 날짜 저장 키
     public static String dateKey(String uuid) {
         return String.format("%s:%s:date", SCHEDULE_BASE_PREFIX, uuid);
     }

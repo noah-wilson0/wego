@@ -17,6 +17,9 @@ public class CitySlug {
     @Column(name = "slug")
     private String slug;
 
+    @Column(name = "label",nullable = false)
+    private String label;
+
     @Id
     @Column(name = "city_code_id")
     private Integer cityCodeId;

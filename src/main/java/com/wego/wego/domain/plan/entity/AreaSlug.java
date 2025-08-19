@@ -1,11 +1,12 @@
 package com.wego.wego.domain.plan.entity;
 
-import com.wego.wego.external.tourapi.location.entity.AreaCode;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @Entity
 @Table(name="area_slug")
@@ -23,4 +24,7 @@ public class AreaSlug {
 
     @Column(name = "area_code_id")
     private Integer  areaCodeId;
+
+//    @OneToMany(mappedBy = "areaSlug")
+//    private List<TravelPlan> travelPlans=new ArrayList<>();
 }

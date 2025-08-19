@@ -17,6 +17,11 @@ public class TravelPlanController {
     private final TravelPlanService travelPlanService;
 
 
+    @PostMapping("/slug/{uuid}")
+    public void saveSlug(@PathVariable String uuid, @RequestBody String slug) {
+        travelPlanService.saveTempSlug(slug, uuid);
+    }
+
     /**
      * 단순한 임시 여행 일정 조회
      * @param uuid
@@ -58,7 +63,7 @@ public class TravelPlanController {
      *
      * @return
      */
-    @GetMapping("/{travel_plan_id}/schedule")
+    @GetMapping("/member/schedule")
     public ResponseEntity<TravelPlanResponse> getSchedule(@AuthenticationPrincipal Member member) {
         TravelPlanResponse travelPlan = travelPlanService.getTravelPlan(member);
         return ResponseEntity.ok().body(travelPlan);

@@ -8,9 +8,7 @@ import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
 import com.wego.wego.domain.plan.repository.AreaSlugRepository;
 import com.wego.wego.domain.plan.repository.CitySlugRepository;
 import com.wego.wego.external.tourapi.location.repository.CityCodeRepository;
-import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
-import com.wego.wego.global.enums.PlaceType;
 import com.wego.wego.global.util.RedisKeyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -39,10 +36,20 @@ public class TravelPlanPlaceService {
     private final PlaceRepository placeRepository;
     private final CityCodeRepository cityCodeRepository;
 
-    public Page<TravelPlanPlaceResponse> findAll(String areaSlug, String placeType, Pageable pageable) {
+    public Page<TravelPlanPlaceResponse> findAll(String uuid, String placeType, Pageable pageable) {
+        String slug;
+        String slugJson = redisTemplate.opsForValue().get(RedisKeyUtils.slugKey(uuid));
+        log.info(slugJson);
+        try {
+            slug = objectMapper.readTree(slugJson).get("slug").asText();
 
-        List<Integer> cityIds = resolveCityIds(areaSlug);
-
+        } catch (JsonProcessingException e) {
+            log.info("여행 경로 데이터 통합 중 객체화 실패");
+            throw new RuntimeException(e);
+        }
+        log.info(slug);
+        List<Integer> cityIds = resolveCityIds(slug);
+        log.info(cityIds.toString());
         return placeRepository.findByPlaceTypeAndCityCodeIdIn(placeType, cityIds, pageable)
                 .map(place -> TravelPlanPlaceResponse.builder()
                         .contentId(place.getContentId())
@@ -83,7 +90,7 @@ public class TravelPlanPlaceService {
     private List<Integer> resolveCityIds(String areaSlug) {
         Optional<Integer> areaCodeIdBySlug = areaSlugRepository.findAreaCodeIdBySlug(areaSlug);
 
-        if (areaCodeIdBySlug != null) {
+        if (areaCodeIdBySlug.isPresent()) {
             return cityCodeRepository.findCityCodeIdsByAreaCodeId(areaCodeIdBySlug.get());
 
         } else {

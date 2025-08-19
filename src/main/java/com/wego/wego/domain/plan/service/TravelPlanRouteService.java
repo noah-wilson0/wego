@@ -35,8 +35,10 @@ public class TravelPlanRouteService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public String getScheduleRoute(String uuid, String route_type) {
+    public String saveScheduleRoute(String uuid, String route_type) {
         String route;
+        String slug;
+        String slugJson = redisTemplate.opsForValue().get(RedisKeyUtils.slugKey(uuid));
         String dateJson = redisTemplate.opsForValue().get(RedisKeyUtils.dateKey(uuid));
         String timesJson = redisTemplate.opsForValue().get(RedisKeyUtils.timeKey(uuid));
         String placesJson = redisTemplate.opsForValue().get(RedisKeyUtils.placesKey(uuid));
@@ -48,6 +50,7 @@ public class TravelPlanRouteService {
         List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests;
 
         try {
+            slug = objectMapper.readTree(slugJson).get("slug").asText();
             tempTravelDateRequests = objectMapper.readValue(dateJson, TempTravelDateRequest.class);
             tempTravelTimeRequests = objectMapper.readValue(timesJson, TempTravelTimeRequest.class);
             tempTravelPlanPlaceRequests = objectMapper.readValue(placesJson, new TypeReference<>() {});
@@ -164,6 +167,7 @@ public class TravelPlanRouteService {
         } //for i
 
         TravelPlanRouteJson schedule = new TravelPlanRouteJson(
+                slug,
                 tempTravelDateRequests.startDate(),
                 tempTravelDateRequests.endDate(),
                 daySchedules,

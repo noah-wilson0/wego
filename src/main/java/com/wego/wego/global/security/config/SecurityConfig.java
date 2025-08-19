@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/members/sign-in","/members/signup",
                                 "/auth/me",
                                 "/chemi/result", "/chemi/all", "/images/chemi/**",
+                                "/travel_plan/slug/**",
                                 "/travel_plan/date/**","/travel_plan/place/**",
                                 "/travel_plan/route/**","travel_plan/recommend",
                                 "/travel_plan/temp/schedule/**").permitAll()

@@ -21,7 +21,7 @@ public class TravelPlanRouteController {
 
     @PostMapping("/temp/schedule/{route_type}/{uuid}")
     public ResponseEntity<?> createTempScheduleRoute(@PathVariable String route_type, @PathVariable String uuid) {
-        String route = travelPlanRouteService.getScheduleRoute(uuid, route_type);
+        travelPlanRouteService.saveScheduleRoute(uuid, route_type);
         return ResponseEntity.ok().build();
     }
 

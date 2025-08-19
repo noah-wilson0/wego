@@ -21,7 +21,7 @@ class TravelPlanRouteServiceTest {
     String uuid = "88f5f299-4f69-4fe7-ab41-2a72edbce418";
 
     @Test
-    void getScheduleRoute() {
+    void saveScheduleRoute() {
         log.info("장소 json: {}", redisTemplate.opsForValue().get(RedisKeyUtils.placesKey(uuid)));
         log.info("숙소 json: {}", redisTemplate.opsForValue().get(RedisKeyUtils.accommodationsKey(uuid)));
         log.info("날짜 json: {}", redisTemplate.opsForValue().get(RedisKeyUtils.dateKey(uuid)));
