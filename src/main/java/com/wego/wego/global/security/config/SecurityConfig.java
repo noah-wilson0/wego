@@ -43,12 +43,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
                         .requestMatchers("/members/sign-in","/members/signup",
                                 "/auth/me",
-                                "/chemi/result",
+                                "/chemi/result", "/chemi/all", "/images/chemi/**",
                                 "/travel_plan/date/**","/travel_plan/place/**",
                                 "/travel_plan/route/**","travel_plan/recommend",
                                 "/travel_plan/temp/schedule/**").permitAll()
                         .requestMatchers("/travel_plan/{travel_plan_id}/schedule",
-                                "/travel_plan/schedule/**").hasRole("USER")
+                                "/travel_plan/schedule/**",
+                                 "chemi/me", "chemi/similar" ).hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();

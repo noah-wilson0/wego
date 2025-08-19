@@ -1,7 +1,10 @@
 package com.wego.wego.domain.chemi.controller;
 
 import com.wego.wego.domain.chemi.ChemiService;
+import com.wego.wego.domain.chemi.dto.ChemiDto;
+import com.wego.wego.domain.chemi.dto.ChemiListResponse;
 import com.wego.wego.domain.chemi.dto.ChemiRequest;
+import com.wego.wego.domain.chemi.entity.Chemi;
 import com.wego.wego.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,6 +21,13 @@ import java.util.List;
 public class ChemiController {
     private static final Logger log = LoggerFactory.getLogger(ChemiController.class);
     private final ChemiService chemiService;
+
+    @GetMapping("/all")
+    public ResponseEntity<ChemiListResponse> getChemiList() {
+        ChemiListResponse chemiListResponse = new ChemiListResponse(chemiService.findAll());
+
+        return ResponseEntity.ok(chemiListResponse);
+    }
 
     /**
      * 케미 유형 테스트 결과 반환 컨트롤러
@@ -56,4 +66,18 @@ public class ChemiController {
     }
 
 
+    @GetMapping("/me")
+    public ResponseEntity<ChemiDto> getMemberChemi(@AuthenticationPrincipal Member member) {
+        ChemiDto chemiDto = chemiService.findByMemberChemi(member);
+
+        return ResponseEntity.ok(chemiDto);
+    }
+
+
+    @GetMapping("/similar")
+    public ResponseEntity<ChemiListResponse> getChemiSimilar(@AuthenticationPrincipal Member member) {
+        ChemiListResponse chemiListResponse = chemiService.findBySimilarChemi(member);
+
+        return ResponseEntity.ok(chemiListResponse);
+    }
 }

@@ -1,5 +1,7 @@
 package com.wego.wego.domain.chemi;
 
+import com.wego.wego.domain.chemi.dto.ChemiDto;
+import com.wego.wego.domain.chemi.dto.ChemiListResponse;
 import com.wego.wego.domain.chemi.entity.Chemi;
 import com.wego.wego.domain.chemi.repository.ChemiRepository;
 import com.wego.wego.domain.member.entity.Member;
@@ -11,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -48,5 +52,44 @@ public class ChemiService {
                 });
 
         findMember.updateChemiId(findChemi.getId());
+    }
+
+    public List<ChemiDto> findAll() {
+
+        return chemiRepository.findAll().stream()
+                .map(c -> new ChemiDto(c.getName(),c.getImage(), c.getDescription()))
+                .toList();
+
+    }
+
+    public ChemiDto findByMemberChemi(Member member) {
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없음"));
+        Long chemiId = findMember.getChemiId();
+        if (chemiId == null) {
+            throw new RuntimeException("케미 테스트 해야 됨");
+        }else {
+            Chemi chemi = chemiRepository.findById(chemiId)
+                    .orElseThrow(() -> new RuntimeException("케미 없음"));
+
+            return new ChemiDto(chemi.getName(), chemi.getImage(), chemi.getDescription());
+        }
+    }
+
+    public ChemiListResponse findBySimilarChemi(Member member) {
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없음"));
+
+        Long chemiId = findMember.getChemiId();
+        if (chemiId == null) {
+            throw new RuntimeException("케미 테스트 해야 됨");
+        }else {
+            Chemi chemi = chemiRepository.findById(chemiId)
+                    .orElseThrow(() -> new RuntimeException("케미 없음"));
+
+            Set<Chemi> similarChemis = chemi.getSimilarChemis();
+            return new ChemiListResponse(similarChemis.stream().map(
+                    c -> new ChemiDto(c.getName(),c.getImage(),c.getDescription())).toList());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.wego.wego.domain.chemi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,5 +33,6 @@ public class Chemi {
             joinColumns = @JoinColumn(name = "chemi_id"),
             inverseJoinColumns = @JoinColumn(name = "similar_chemi_id")
     )
+    @JsonIgnore
     private Set<Chemi> similarChemis = new HashSet<>();
 }
