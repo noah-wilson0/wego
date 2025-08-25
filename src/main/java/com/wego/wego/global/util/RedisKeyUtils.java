@@ -48,10 +48,16 @@ public class RedisKeyUtils {
         return String.format("wego:auth:whitelist:%s", username);
     }
 
-    public static String blackListKey(String username) {
-        return String.format("wego:auth:blacklist:", username);
+    public static String changePasswordBlackListKey(String username) {
+        return String.format("wego:auth:blacklist:pw-change:%s", username);
+    }
+    public static String logoutBlackListKey(String username) {
+        return String.format("wego:auth:blacklist:logout:%s", username);
     }
 
+    public static String blackListKey(String username) {
+        return String.format("wego:auth:blacklist:%s", username);
+    }
 
     // 전체 prefix 반환 (디버깅, keys 조회용)
     public static String allSchedulePrefix() {

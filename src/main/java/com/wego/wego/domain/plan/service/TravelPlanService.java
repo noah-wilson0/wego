@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TravelPlanService {
 
@@ -383,5 +384,97 @@ public class TravelPlanService {
     }
 
 
+    public TravelPlanResponse findOne(String travelPlanId, Member member) {
+
+        // 1) 본인 소유 일정만 조회
+        TravelPlan travelPlan = travelPlanRepository
+                .findOneByIdAndMember(Long.valueOf(travelPlanId), member.getId())
+                .orElseThrow(() -> new RuntimeException("여행 일정 없음"));
+
+        List<TravelPlanResponse.DaySchedule> days = new ArrayList<>();
+        List<TravelPlanResponse.RouteInfo> routes = new ArrayList<>();
+
+        // 2) Day 단위로 장소/숙소/경로 가공
+        for (TravelPlanDay travelPlanDay : travelPlan.getTravelPlanDays()) {
+
+            // --- Places / Accommodation ---
+            List<TravelPlanResponse.PlaceItem> placeItems = new ArrayList<>();
+            TravelPlanResponse.AccommodationItem accommodationItem = null;
+
+            List<TravelPlanPlace> dayPlaces = new ArrayList<>(travelPlanDay.getTravelPlanPlaces());
+            dayPlaces.sort(Comparator.comparingInt(TravelPlanPlace::getSequence));
+
+            for (TravelPlanPlace tpp : dayPlaces) {
+                boolean isAccommodation =
+                        PlaceType.ACCOMMODATION.getCode().equals(tpp.getPlace().getPlaceType());
+
+                if (isAccommodation && accommodationItem == null) {
+                    accommodationItem = new TravelPlanResponse.AccommodationItem(
+                            tpp.getPlace().getContentId(),
+                            tpp.getPlace().getPlaceType(),
+                            tpp.getPlace().getTitle(),
+                            tpp.getPlace().getImage(),
+                            tpp.getSequence(),
+                            tpp.getStartTime(),
+                            tpp.getEndTime()
+                    );
+                } else {
+                    placeItems.add(new TravelPlanResponse.PlaceItem(
+                            tpp.getPlace().getContentId(),
+                            tpp.getPlace().getPlaceType(),
+                            tpp.getPlace().getTitle(),
+                            tpp.getPlace().getImage(),
+                            tpp.getSequence(),
+                            tpp.getStartTime(),
+                            tpp.getEndTime()
+                    ));
+                }
+            }
+
+            // --- Routes ---
+            Map<LocalDate, List<TravelPlanResponse.RouteDetail>> dailyRoutes = new HashMap<>();
+            List<TravelPlanResponse.RouteDetail> routeDetails = new ArrayList<>();
+
+            List<TravelPlanRoute> dayRoutes = new ArrayList<>(travelPlanDay.getTravelPlanRoutes());
+            dayRoutes.sort(Comparator.comparingInt(TravelPlanRoute::getSequence));
+
+            for (TravelPlanRoute tpr : dayRoutes) {
+                routeDetails.add(new TravelPlanResponse.RouteDetail(
+                        tpr.getSequence(),
+                        tpr.getOrigin().getContentId(),
+                        tpr.getDestination().getContentId(),
+                        tpr.getDuration()
+                ));
+            }
+            if (!routeDetails.isEmpty()) {
+                dailyRoutes.put(travelPlanDay.getDate(), routeDetails);
+            }
+
+            String routeType = dayRoutes.isEmpty() ? null : String.valueOf(dayRoutes.get(0).getRouteType());
+
+            // --- assemble ---
+            days.add(new TravelPlanResponse.DaySchedule(
+                    travelPlanDay.getDate(),
+                    travelPlanDay.getStartTime(),
+                    travelPlanDay.getEndTime(),
+                    placeItems,
+                    accommodationItem
+            ));
+
+            routes.add(new TravelPlanResponse.RouteInfo(
+                    routeType,
+                    dailyRoutes
+            ));
+        }
+
+        // 3) 최종 응답
+        return new TravelPlanResponse(
+                travelPlan.getStartDate(),
+                travelPlan.getEndDate(),
+                days,
+                routes,
+                travelPlan.getCreatedAt()
+        );
+    }
 
 }

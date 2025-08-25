@@ -50,7 +50,12 @@ public class SecurityConfig {
                                 "/travel_plan/temp/schedule/**").permitAll()
                         .requestMatchers("/travel_plan/{travel_plan_id}/schedule",
                                 "/travel_plan/schedule/**",
-                                 "chemi/me", "chemi/similar" ).hasRole("USER")
+                                 "chemi/me", "chemi/similar",
+                                "/profile/travel-plans/all","/profile/travel-plans", "/profile/me",
+                                "/members/check-password", "/members/change-password",
+                                "/members/change-info", "/members/logout",
+                                "/travel_plan/member/schedule/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/members").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();
@@ -67,7 +72,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:5174","http://localhost:5173")); // 프론트 주소
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH","PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // 쿠키 포함 허용 시 true
 

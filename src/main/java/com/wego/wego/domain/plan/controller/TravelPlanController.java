@@ -69,4 +69,14 @@ public class TravelPlanController {
         return ResponseEntity.ok().body(travelPlan);
     }
 
+    /**
+     * 여행 일정 단일 상세 조회
+     */
+    @GetMapping("/member/schedule/{travelPlanId}")
+    public ResponseEntity<?> getTravelPlanScheduleFindOne(@PathVariable String travelPlanId, @AuthenticationPrincipal Member member) {
+        TravelPlanResponse travelPlanResponse = travelPlanService.findOne(travelPlanId, member);
+
+        return ResponseEntity.ok().body(travelPlanResponse);
+    }
+
 }

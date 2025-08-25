@@ -1,7 +1,6 @@
 package com.wego.wego.domain.member.service;
 
-import com.wego.wego.domain.member.dto.SignInRequest;
-import com.wego.wego.domain.member.dto.SignupRequest;
+import com.wego.wego.domain.member.dto.*;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.member.repository.MemberRepository;
 import com.wego.wego.global.security.JwtProvider;
@@ -73,4 +72,32 @@ public class MemberService {
         return memberRepository.findById(memberId);
     }
 
+    public MemberDetailResponse getMemberDetail(long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(
+                () -> new RuntimeException("존재 하지 않는 회원")
+        );
+        return new MemberDetailResponse(member.getUsername(), member.getName());
+    }
+
+    @Transactional
+    public void updatePassword(String username, UpdatePasswordRequest updatePasswordRequest) {
+        Member member = memberRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("존재 하지 않는 회원"));
+        member.changePassword(passwordEncoder.encode(updatePasswordRequest.newPassword()));
+    }
+
+    @Transactional
+    public void updateMemberInfo(UpdateUserInfoRequest updateUserInfoRequest, Member member) {
+        Member findMember = memberRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new RuntimeException("존재 하지 않는 회원"));
+        findMember.changeName(updateUserInfoRequest.name());
+    }
+
+    @Transactional
+    public void deleteMember(Member member) {
+        Member findMember = memberRepository.findByUsername(member.getUsername())
+                .orElseThrow(() -> new RuntimeException("존재하지 않은 회원"));
+        memberRepository.deleteByUsername(findMember.getUsername());
+
+    }
 }

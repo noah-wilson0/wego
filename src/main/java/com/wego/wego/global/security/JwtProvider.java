@@ -114,6 +114,19 @@ public class JwtProvider {
                 .getBody();
     }
 
+    public Long getExpiryTime(String token) {
+        try {
+            Claims claims = parseClaims(token);
+            Date expiration = claims.getExpiration();
+            return expiration.getTime(); // 만료 시간(Unix Timestamp, ms 단위)
+        } catch (ExpiredJwtException e) {
+            // 이미 만료된 토큰도 만료 시간은 추출 가능
+            return e.getClaims().getExpiration().getTime();
+        }
+
+
+    }
+
 
 
 }

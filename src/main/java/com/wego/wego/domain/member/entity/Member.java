@@ -52,5 +52,10 @@ public class Member {
     public void updateChemiId(Long chemiId) {
         this.chemiId=chemiId;
     }
-
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
+    public void changeName(String newName) {
+        this.name = newName;
+    }
 }
