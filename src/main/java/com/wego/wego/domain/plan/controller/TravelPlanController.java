@@ -59,7 +59,7 @@ public class TravelPlanController {
         return ResponseEntity.ok().build();
     }
     /**
-     * 회원 일정 조회(from DB)
+     * 회원 일정 조회(from DB) 마이 페이지 메인
      *
      * @return
      */

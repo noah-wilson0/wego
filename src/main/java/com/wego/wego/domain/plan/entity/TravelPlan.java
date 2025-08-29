@@ -52,6 +52,11 @@ public class TravelPlan {
     @ToString.Exclude
     private List<TravelPlanDay> travelPlanDays = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "travelPlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    private List<TravelPlanShare> travelPlanShares = new ArrayList<>();
+
     public void changeTravelPlanDays(List<TravelPlanDay> travelPlanDays) {
         this.travelPlanDays = travelPlanDays;
     }

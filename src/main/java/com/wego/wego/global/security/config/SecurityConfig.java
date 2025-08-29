@@ -46,15 +46,17 @@ public class SecurityConfig {
                                 "/chemi/result", "/chemi/all", "/images/chemi/**",
                                 "/travel_plan/slug/**",
                                 "/travel_plan/date/**","/travel_plan/place/**",
-                                "/travel_plan/route/**","travel_plan/recommend",
-                                "/travel_plan/temp/schedule/**").permitAll()
+                                "/travel_plan/route/**","/travel_plan/recommend",
+                                "/travel_plan/temp/schedule/**",
+                                "travel_plan/share/**").permitAll()
                         .requestMatchers("/travel_plan/{travel_plan_id}/schedule",
                                 "/travel_plan/schedule/**",
                                  "chemi/me", "chemi/similar",
                                 "/profile/travel-plans/all","/profile/travel-plans", "/profile/me",
                                 "/members/check-password", "/members/change-password",
                                 "/members/change-info", "/members/logout",
-                                "/travel_plan/member/schedule/**").hasRole("USER")
+                                "/travel_plan/member/schedule/**",
+                                "/travel_plan/*/share").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/members").hasRole("USER")
                         .anyRequest().authenticated()
                 )
