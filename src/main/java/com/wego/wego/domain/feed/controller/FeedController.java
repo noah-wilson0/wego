@@ -49,7 +49,6 @@ public class FeedController {
      * @return
      */
     @GetMapping("/all/paged")
-
     public ResponseEntity<Page<FeedResponse>> getPagedFeeds(@PageableDefault(size=12, sort = {"likeCount", "viewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
         Page<FeedResponse> feedResponses = feedService.getAll(pageable);
         return ResponseEntity.ok(feedResponses);

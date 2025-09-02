@@ -10,6 +10,7 @@ import java.util.*;
 
 public record FeedResponse(
         Long feed_id,
+        String author,
         String title,
         String body,
         int people,
@@ -172,6 +173,7 @@ public record FeedResponse(
 
         return new FeedResponse(
                 feed.getId(),
+                feed.getMember().getName(),
                 feed.getTitle(),
                 feed.getBody(),
                 feed.getPeople(),

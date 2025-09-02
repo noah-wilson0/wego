@@ -42,7 +42,7 @@ public class Feed {
     @Column(name = "view_count", nullable = false)
     private int viewCount=0;
 
-    @Column(name = "body", nullable = false)
+    @Column(name = "body", nullable = false, columnDefinition = "TEXT")
     private String body;
 
     @Builder.Default
