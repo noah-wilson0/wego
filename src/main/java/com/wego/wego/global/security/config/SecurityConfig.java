@@ -48,16 +48,19 @@ public class SecurityConfig {
                                 "/travel_plan/date/**","/travel_plan/place/**",
                                 "/travel_plan/route/**","/travel_plan/recommend",
                                 "/travel_plan/temp/schedule/**",
-                                "travel_plan/share/**").permitAll()
+                                "travel_plan/share/**",
+                                "/feed/all/paged").permitAll()
                         .requestMatchers("/travel_plan/{travel_plan_id}/schedule",
                                 "/travel_plan/schedule/**",
-                                 "chemi/me", "chemi/similar",
+                                 "/chemi/me", "/chemi/similar","/chemi/labels",
                                 "/profile/travel-plans/all","/profile/travel-plans", "/profile/me",
                                 "/members/check-password", "/members/change-password",
                                 "/members/change-info", "/members/logout",
-                                "/travel_plan/member/schedule/**",
-                                "/travel_plan/*/share").hasRole("USER")
+                                "/members/feed",
+                                "/travel_plan/member/schedule/**", "/travel_plan/*/share",
+                                "/feed/init/**", "/feed/*").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/members").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/feed").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();

@@ -9,5 +9,4 @@ public interface ChemiRepository extends JpaRepository<Chemi, Long> {
 
     Optional<Chemi> findByName(String name);
 
-
 }

@@ -1,5 +1,6 @@
 package com.wego.wego.domain.member.controller;
 
+import com.wego.wego.domain.feed.dto.FeedResponse;
 import com.wego.wego.domain.member.dto.SignInRequest;
 import com.wego.wego.domain.member.dto.SignupRequest;
 import com.wego.wego.domain.member.dto.UpdatePasswordRequest;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RequestMapping("/members")
@@ -183,6 +186,16 @@ public class MemberController {
                 .header(HttpHeaders.SET_COOKIE, JwtCookieUtils.deleteAccessTokenCookie().toString())
                 .header(HttpHeaders.SET_COOKIE, JwtCookieUtils.deleteRefreshTokenCookie().toString())
                 .body("회원 탈퇴가 완료되었습니다.");
+    }
+
+    /**
+     * 마이 페이지 회원 피드 리스트 조회
+     * @param member
+     * @return
+     */
+    @GetMapping("/feed")
+    public ResponseEntity<List<FeedResponse>> getMemberFeeds(@AuthenticationPrincipal Member member) {
+        return ResponseEntity.ok(memberService.getFeedsByMember(member));
     }
 
 

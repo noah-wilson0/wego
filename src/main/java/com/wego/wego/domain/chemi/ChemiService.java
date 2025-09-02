@@ -1,6 +1,7 @@
 package com.wego.wego.domain.chemi;
 
 import com.wego.wego.domain.chemi.dto.ChemiDto;
+import com.wego.wego.domain.chemi.dto.ChemiLabelResponse;
 import com.wego.wego.domain.chemi.dto.ChemiListResponse;
 import com.wego.wego.domain.chemi.entity.Chemi;
 import com.wego.wego.domain.chemi.repository.ChemiRepository;
@@ -58,6 +59,13 @@ public class ChemiService {
 
         return chemiRepository.findAll().stream()
                 .map(c -> new ChemiDto(c.getName(),c.getImage(), c.getDescription()))
+                .toList();
+
+    }
+    public List<ChemiLabelResponse> findAllLabels() {
+
+        return chemiRepository.findAll().stream()
+                .map(c -> new ChemiLabelResponse(c.getId(), c.getName(),c.getDescription()))
                 .toList();
 
     }

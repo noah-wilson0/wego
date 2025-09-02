@@ -1,5 +1,6 @@
 package com.wego.wego.domain.member.service;
 
+import com.wego.wego.domain.feed.dto.FeedResponse;
 import com.wego.wego.domain.member.dto.*;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.member.repository.MemberRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +33,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
     private final MemberRepository memberRepository;
+
 
     @Transactional
     public void persist(SignupRequest signupRequest) {
@@ -99,5 +102,18 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않은 회원"));
         memberRepository.deleteByUsername(findMember.getUsername());
 
+    }
+
+    /**
+     * TODO 모든 Feed 일정 데이터가 필요한게 아니고 피드 카드에 표현될 정도만 필요한거라서 개선 필요함
+     * @param member
+     * @return
+     */
+    public List<FeedResponse> getFeedsByMember(Member member) {
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(
+                        () -> new RuntimeException("존재하지 않는 회원")
+                );
+        return findMember.getFeeds().stream().map(FeedResponse::from).toList();
     }
 }

@@ -1,5 +1,6 @@
 package com.wego.wego.domain.member.entity;
 
+import com.wego.wego.domain.feed.entity.Feed;
 import com.wego.wego.domain.plan.entity.TravelPlan;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,10 +27,6 @@ public class Member {
     @Builder.Default
     private Long chemiId=null;
 
-    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @ToString.Exclude
-    List<TravelPlan> travelPlans=new ArrayList<>();
-
     @Column(nullable = false)
     private String username;
 
@@ -47,7 +44,13 @@ public class Member {
     @Builder.Default
     private LocalDate created_at=LocalDate.now();
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<TravelPlan> travelPlans=new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    List<Feed> feeds=new ArrayList<>();
 
     public void updateChemiId(Long chemiId) {
         this.chemiId=chemiId;

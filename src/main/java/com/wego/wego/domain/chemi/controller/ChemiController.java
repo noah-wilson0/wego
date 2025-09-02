@@ -4,7 +4,6 @@ import com.wego.wego.domain.chemi.ChemiService;
 import com.wego.wego.domain.chemi.dto.ChemiDto;
 import com.wego.wego.domain.chemi.dto.ChemiListResponse;
 import com.wego.wego.domain.chemi.dto.ChemiRequest;
-import com.wego.wego.domain.chemi.entity.Chemi;
 import com.wego.wego.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -12,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/chemi")
@@ -77,6 +74,14 @@ public class ChemiController {
     @GetMapping("/similar")
     public ResponseEntity<ChemiListResponse> getChemiSimilar(@AuthenticationPrincipal Member member) {
         ChemiListResponse chemiListResponse = chemiService.findBySimilarChemi(member);
+
+        return ResponseEntity.ok(chemiListResponse);
+    }
+
+
+    @GetMapping("/labels")
+    public ResponseEntity<ChemiListResponse> getChemiLabels() {
+        ChemiListResponse chemiListResponse = new ChemiListResponse(chemiService.findAllLabels());
 
         return ResponseEntity.ok(chemiListResponse);
     }

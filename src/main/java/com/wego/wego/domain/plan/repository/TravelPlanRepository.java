@@ -16,6 +16,8 @@ public interface TravelPlanRepository extends JpaRepository<TravelPlan, Long> {
 
     List<TravelPlan> findTravelPlansByMember(Member member);
 
+    Optional<TravelPlan> findByMemberAndId(Member member, Long TravelPlanId);
+
     @Query("select tp from TravelPlan tp where tp.id = :id and tp.member.id = :memberId")
     Optional<TravelPlan> findOneByIdAndMember(@Param("id") Long id, @Param("memberId") Long memberId);
 
