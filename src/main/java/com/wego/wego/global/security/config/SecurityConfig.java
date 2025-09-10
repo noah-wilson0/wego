@@ -59,10 +59,23 @@ public class SecurityConfig {
                                 "/members/change-info", "/members/logout",
                                 "/members/feed",
                                 "/travel_plan/member/schedule/**", "/travel_plan/*/share",
-                                "/feed/init/**").hasRole("USER")
+                                "/feed/init/**",
+                                "/travel_plan/settlements/{travelPlanId}/result",
+                                "/travel_plan/settlements/share/{token}/result").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/members").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/travel_plan/settlements/{travelPlanId}",
+                                "/travel_plan/settlements/share/{token}").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/feed",
-                                "/feed/{feed_id}/comments").hasRole("USER")
+                                "/feed/{feed_id}/comments",
+                                "/travel_plan/settlements/{travelPlanId}",
+                                "/travel_plan/settlements/{travelPlanId}",
+                                "/travel_plan/settlements/{travelPlanId}/items",
+                                "/travel_plan/settlements/share/{token}",
+                                "/travel_plan/settlements/share/{token}",
+                                "/travel_plan/settlements/share/{token}/items").hasRole("USER")
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/travel_plan/settlements/{travelPlanId}",
+                                "/travel_plan/settlements/share/{token}").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();
