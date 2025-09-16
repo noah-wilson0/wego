@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
-                        .requestMatchers("/members/sign-in","/members/signup",
+                        .requestMatchers("/auth/sign-in","/members/sign-up",
                                 "/auth/me",
                                 "/chemi/result", "/chemi/all", "/images/chemi/**",
                                 "/travel_plan/slug/**",
@@ -51,19 +51,20 @@ public class SecurityConfig {
                                 "/travel_plan/share/**",
                                 "/feed/all/paged",
                                 "/feed/{feed_id}/comments").permitAll()
-                        .requestMatchers("/travel_plan/{travel_plan_id}/schedule",
+                        .requestMatchers("/auth/sign-out",
+                                "/me/check-password", "/me/change-password",
+                                "/me/change-info", "/me/chemi",
+                                "/me/feeds", "/me/travel-plans","/me/imminent",
+                                "/travel_plan/{travel_plan_id}/schedule",
                                 "/travel_plan/schedule/**",
-                                 "/chemi/me", "/chemi/similar","/chemi/labels",
-                                "/profile/travel-plans/all","/profile/travel-plans", "/profile/me",
-                                "/members/check-password", "/members/change-password",
-                                "/members/change-info", "/members/logout",
-                                "/members/feed",
+                                "/chemi/similar","/chemi/labels",
                                 "/travel_plan/member/schedule/**", "/travel_plan/*/share",
                                 "/feed/init/**",
                                 "/travel_plan/settlements/{travelPlanId}/result",
                                 "/travel_plan/settlements/share/{token}/result").hasRole("USER")
-                        .requestMatchers(HttpMethod.DELETE, "/members").hasRole("USER")
-                        .requestMatchers(HttpMethod.GET, "/travel_plan/settlements/{travelPlanId}",
+                        .requestMatchers(HttpMethod.DELETE, "/me").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/me",
+                                "/travel_plan/settlements/{travelPlanId}",
                                 "/travel_plan/settlements/share/{token}").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/feed",
                                 "/feed/{feed_id}/comments",

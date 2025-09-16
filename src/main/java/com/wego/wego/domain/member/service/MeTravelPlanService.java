@@ -1,9 +1,9 @@
-package com.wego.wego.domain.profile.service;
+package com.wego.wego.domain.member.service;
 
+import com.wego.wego.domain.member.dto.TravelPlanSimpleResponse;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.plan.entity.TravelPlan;
 import com.wego.wego.domain.plan.repository.TravelPlanRepository;
-import com.wego.wego.domain.profile.dto.TravelPlanSimpleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,12 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-
 @Slf4j
 @Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
-public class ProfileTravelService {
+public class MeTravelPlanService {
     private final TravelPlanRepository travelPlanRepository;
 
     public List<TravelPlanSimpleResponse> getTravelPlans(Member member, String status) {
@@ -32,7 +31,6 @@ public class ProfileTravelService {
         log.info("travelPlan: {}", travelPlan.toString());
         return  new TravelPlanSimpleResponse(travelPlan.getId(), travelPlan.getSlug(), travelPlan.getTitle(), travelPlan.getStartDate(), travelPlan.getEndDate(), travelPlan.getCreatedAt());
     }
-
 
     public List<TravelPlanSimpleResponse> getAllTravelPlans(Member member) {
         List<TravelPlan> travelPlansByMember = travelPlanRepository.findTravelPlansByMember(member);

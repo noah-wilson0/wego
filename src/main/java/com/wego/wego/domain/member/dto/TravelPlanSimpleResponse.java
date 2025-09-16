@@ -1,4 +1,4 @@
-package com.wego.wego.domain.profile.dto;
+package com.wego.wego.domain.member.dto;
 
 import java.time.LocalDate;
 

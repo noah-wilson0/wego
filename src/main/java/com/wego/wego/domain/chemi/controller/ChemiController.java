@@ -54,23 +54,6 @@ public class ChemiController {
     }
 
 
-    /**
-     * 케미 유형 저장용 컨트롤러
-     */
-    @PostMapping("/me")
-    public void chemiPersist(@RequestBody String chemi, @AuthenticationPrincipal Member member) {
-        chemiService.persistMemberChemi(chemi, member);
-    }
-
-
-    @GetMapping("/me")
-    public ResponseEntity<ChemiDto> getMemberChemi(@AuthenticationPrincipal Member member) {
-        ChemiDto chemiDto = chemiService.findByMemberChemi(member);
-
-        return ResponseEntity.ok(chemiDto);
-    }
-
-
     @GetMapping("/similar")
     public ResponseEntity<ChemiListResponse> getChemiSimilar(@AuthenticationPrincipal Member member) {
         ChemiListResponse chemiListResponse = chemiService.findBySimilarChemi(member);

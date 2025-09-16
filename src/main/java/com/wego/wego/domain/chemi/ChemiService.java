@@ -39,21 +39,7 @@ public class ChemiService {
                 .map(Map.Entry::getKey)
                 .orElse(null);
     }
-    @Transactional
-    public void persistMemberChemi(String chemi, Member member) {
-        log.info(chemi);
-        Chemi findChemi = chemiRepository.findByName(chemi)
-                .orElseThrow(() -> {
-                    throw new RuntimeException("케미 못참음");
-                });
 
-        Member findMember = memberRepository.findByUsername(member.getUsername())
-                .orElseThrow(() -> {
-                    throw new RuntimeException("유저 못참음");
-                });
-
-        findMember.updateChemiId(findChemi.getId());
-    }
 
     public List<ChemiDto> findAll() {
 
@@ -68,20 +54,6 @@ public class ChemiService {
                 .map(c -> new ChemiLabelResponse(c.getId(), c.getName(),c.getDescription()))
                 .toList();
 
-    }
-
-    public ChemiDto findByMemberChemi(Member member) {
-        Member findMember = memberRepository.findById(member.getId())
-                .orElseThrow(() -> new RuntimeException("회원을 찾을 수 없음"));
-        Long chemiId = findMember.getChemiId();
-        if (chemiId == null) {
-            throw new RuntimeException("케미 테스트 해야 됨");
-        }else {
-            Chemi chemi = chemiRepository.findById(chemiId)
-                    .orElseThrow(() -> new RuntimeException("케미 없음"));
-
-            return new ChemiDto(chemi.getName(), chemi.getImage(), chemi.getDescription());
-        }
     }
 
     public ChemiListResponse findBySimilarChemi(Member member) {
