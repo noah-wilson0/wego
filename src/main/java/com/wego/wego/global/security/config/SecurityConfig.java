@@ -43,40 +43,40 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() //로그아웃 문제
                         .requestMatchers("/auth/sign-in","/members/sign-up",
                                 "/auth/me",
-                                "/chemi/result", "/chemi/all", "/images/chemi/**",
-                                "/travel_plan/slug/**",
-                                "/travel_plan/date/**","/travel_plan/place/**",
-                                "/travel_plan/route/**","/travel_plan/recommend",
-                                "/travel_plan/temp/schedule/**",
-                                "/travel_plan/share/**",
-                                "/feed/all/paged",
-                                "/feed/{feed_id}/comments").permitAll()
+                                "/chemis/result", "/chemis/all", "/images/chemi/**",
+                                "/draft-plans/slug/*",
+                                "/draft-plans/*/dates","/draft-plans/*/times",
+                                "/draft-plans/*/*/paged",
+                                "/draft-plans/*/places", "/draft-plans/*/accommodations",
+                                "/draft-plans/*/*/route",
+                                "/draft-plans/*/auto-schedule",
+                                "/travel-plans/*/share",
+                                "/feeds/all/paged",
+                                "/feeds/{feed_id}/comments").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/draft-plans/*").permitAll()
                         .requestMatchers("/auth/sign-out",
                                 "/me/check-password", "/me/change-password",
                                 "/me/change-info", "/me/chemi",
-                                "/me/feeds", "/me/travel-plans","/me/imminent",
-                                "/travel_plan/{travel_plan_id}/schedule",
-                                "/travel_plan/schedule/**",
-                                "/chemi/similar","/chemi/labels",
-                                "/travel_plan/member/schedule/**", "/travel_plan/*/share",
-                                "/feed/init/**",
-                                "/travel_plan/settlements/{travelPlanId}/result",
-                                "/travel_plan/settlements/share/{token}/result").hasRole("USER")
+                                "/me/feeds", "/me/travel-plans","/me/travel-plans/imminent",
+                                "/travel-plans/*/me",
+                                "/chemis/similar","/chemis/labels",
+
+                                "/feeds/init/**",
+                                "/travel-plans/*/settlements/result",
+                                "/travel-share-plans/*/settlements/result").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/me",
-                                "/travel_plan/settlements/{travelPlanId}",
-                                "/travel_plan/settlements/share/{token}").hasRole("USER")
-                        .requestMatchers(HttpMethod.POST, "/feed",
-                                "/feed/{feed_id}/comments",
-                                "/travel_plan/settlements/{travelPlanId}",
-                                "/travel_plan/settlements/{travelPlanId}",
-                                "/travel_plan/settlements/{travelPlanId}/items",
-                                "/travel_plan/settlements/share/{token}",
-                                "/travel_plan/settlements/share/{token}",
-                                "/travel_plan/settlements/share/{token}/items").hasRole("USER")
+                                "/travel-plans/*/settlements","/travel-share-plans/*/settlements",
+                                "/feeds/*","/feeds/*/comments").hasRole("USER")
+                        .requestMatchers(HttpMethod.POST, "/draft-plans/*",
+                                "/feeds", "/feeds/*/comments",
+                                "/travel-plans/*/settlements",
+                                "/travel-share-plans/*/settlements",
+                                "/travel-plans/*/settlements/items",
+                                "/travel-share-plans/*/settlements/items").hasRole("USER")
                         .requestMatchers(HttpMethod.PATCH,
-                                "/travel_plan/settlements/{travelPlanId}",
-                                "/travel_plan/settlements/share/{token}").hasRole("USER")
+                                "/travel-plans/*/settlements",
+                                "/travel-share-plans/*/settlements").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtProvider,redisTemplate), UsernamePasswordAuthenticationFilter.class).build();

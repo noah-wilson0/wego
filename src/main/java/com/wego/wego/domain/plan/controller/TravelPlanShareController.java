@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/travel_plan")
+@RequestMapping("/travel-plans")
 @RequiredArgsConstructor
 public class TravelPlanShareController {
     private final TravelPlanShareService travelPlanShareService;
@@ -26,7 +26,7 @@ public class TravelPlanShareController {
         return ResponseEntity.ok().body(shareToken);
     }
 
-    @GetMapping("/share/{token}")
+    @GetMapping("/{token}")
     public ResponseEntity<?> getShareTravelPlan(@PathVariable String token){
         TravelPlan shareTravelPlan = travelPlanShareService.getShareTravelPlan(token);
         TravelPlanResponse travelPlanResponse = TravelPlanResponse.from(shareTravelPlan);

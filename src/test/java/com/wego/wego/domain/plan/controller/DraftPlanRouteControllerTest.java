@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc(addFilters = false)
-class TravelPlanRouteControllerTest {
+class DraftPlanRouteControllerTest {
     @Autowired
     private MockMvc mockMvc;
 

@@ -11,7 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/travel_plan/settlements/share")
+@RequestMapping("/travel-share-plans/{token}/settlements")
 @RequiredArgsConstructor
 public class SettlementShareController {
     private final SettlementShareService settlementShareService;
@@ -21,20 +21,20 @@ public class SettlementShareController {
      * @param token
      * @return
      */
-    @GetMapping("/{token}")
+    @GetMapping
     public ResponseEntity<SettlementResponse> getTravelPlanSettlements(@PathVariable String token) {
         SettlementResponse settlementResponse = settlementShareService.getAll(token);
 
         return ResponseEntity.ok(settlementResponse);
     }
     /**
-     * 정산하기 생성
+     * 정산하기 예산 생성
      * @param token
      * @param budget
      * @return
      */
 
-    @PostMapping("/{token}")
+    @PostMapping
     public ResponseEntity<Integer> createTravelPlanBudget(@PathVariable String token, @RequestBody int budget) {
         int response = settlementShareService.createBudget(token, budget);
         return ResponseEntity.ok(response);
@@ -46,7 +46,7 @@ public class SettlementShareController {
      * @param budget
      * @return
      */
-    @PatchMapping("/{token}")
+    @PatchMapping
     public ResponseEntity<Integer> updateTravelPlanBudget(@PathVariable String token, @RequestBody int budget) {
         int response = settlementShareService.updateBudget(token, budget);
         return ResponseEntity.ok(response);
@@ -59,7 +59,7 @@ public class SettlementShareController {
      * @param member
      * @return
      */
-    @PostMapping("/{token}/items")
+    @PostMapping("/items")
     public ResponseEntity<String> createSettlementItem(@PathVariable String token, @RequestBody SettlementItemRequest settlementItemRequest, @AuthenticationPrincipal Member member) {
         settlementShareService.saveSettlementItem(token, settlementItemRequest, member);
         return ResponseEntity.ok().build();
@@ -70,7 +70,7 @@ public class SettlementShareController {
      * @return
      */
 
-    @PostMapping("/{token}/result")
+    @PostMapping("/result")
     public ResponseEntity<SettlementResultResponse> createSettlementResult(@PathVariable String token) {
         SettlementResultResponse settlementResultResponse = settlementShareService.createSettlementResult(token);
         return ResponseEntity.ok(settlementResultResponse);
@@ -81,7 +81,7 @@ public class SettlementShareController {
      * @param token
      * @return
      */
-    @GetMapping("/{token}/result")
+    @GetMapping("/result")
     public ResponseEntity<SettlementResultResponse> getSettlementResult(@PathVariable String token) {
         SettlementResultResponse settlementResultResponse = settlementShareService.getSettlementResult(token);
         return ResponseEntity.ok(settlementResultResponse);

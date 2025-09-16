@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/travel_plan/recommend")
+@RequestMapping("/draft-plans")
 @RequiredArgsConstructor
-public class TravelPlanAutoController {
+public class DraftPlanAutoController {
     private final TravelPlanAiMatchingService travelPlanAiMatchingService;
 
-    @PostMapping("/temp/sechedule/auto/{uuid}")
+    @PostMapping("/{uuid}/auto-schedule")
     public ResponseEntity<?> AutoTempTravelPlan(@PathVariable String uuid) {
         travelPlanAiMatchingService.autoTempTravelPlan(uuid);
         return ResponseEntity.ok().body("성공");

@@ -13,12 +13,16 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/chemi")
+@RequestMapping("/chemis")
 @RequiredArgsConstructor
 public class ChemiController {
     private static final Logger log = LoggerFactory.getLogger(ChemiController.class);
     private final ChemiService chemiService;
 
+    /**
+     * 일반 적인 상황에서 케미 데이터 리스트
+     * @return
+     */
     @GetMapping("/all")
     public ResponseEntity<ChemiListResponse> getChemiList() {
         ChemiListResponse chemiListResponse = new ChemiListResponse(chemiService.findAll());
@@ -61,7 +65,10 @@ public class ChemiController {
         return ResponseEntity.ok(chemiListResponse);
     }
 
-
+    /**
+     * 피드 생성 시 케미 테그 리스트 데이터
+     * @return
+     */
     @GetMapping("/labels")
     public ResponseEntity<ChemiListResponse> getChemiLabels() {
         ChemiListResponse chemiListResponse = new ChemiListResponse(chemiService.findAllLabels());

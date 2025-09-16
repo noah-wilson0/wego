@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
-class TravelPlanDayControllerTest {
+class DraftPlanDateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -1,4 +1,4 @@
-package com.wego.wego.domain.plan.service;
+package com.wego.wego.domain.plan.service.draft.route;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

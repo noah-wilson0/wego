@@ -22,6 +22,7 @@ public class MeTravelPlanController {
     private final MeTravelPlanService meTravelPlanService;
 
     /**
+     * 마이페이지
      * 전체 여행 일정 반환
      * @param member status
      * @return
@@ -41,7 +42,7 @@ public class MeTravelPlanController {
      * @param member
      * @return
      */
-    @GetMapping("/imminent")
+    @GetMapping("/travel-plans/imminent")
     public ResponseEntity<TravelPlanSimpleResponse> getTravelPlan(@AuthenticationPrincipal Member member) {
         TravelPlanSimpleResponse travelPlan = meTravelPlanService.getTravelPlan(member);
         log.info("getTravelPlan:{}",travelPlan);

@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/feed")
+@RequestMapping("/feeds")
 @RequiredArgsConstructor
 public class FeedController {
     private final FeedService feedService;

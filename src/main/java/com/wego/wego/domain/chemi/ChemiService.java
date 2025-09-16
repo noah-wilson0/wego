@@ -29,11 +29,11 @@ public class ChemiService {
         Map<String, Integer> scoreTable = ChemiMappingConstants.newScoreTable();
 
         for (int i = 1; i < answers.size()+1; i++) {
-
             String key = ChemiMappingConstants.CHEMI_MAP.get(i).get(answers.get(i-1));
 //            log.info("key:{}",key);
             scoreTable.put(key, scoreTable.get(key) + 1);
         }
+
         return scoreTable.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)

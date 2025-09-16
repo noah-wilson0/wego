@@ -1,6 +1,6 @@
-package com.wego.wego.domain.plan.controller;
+package com.wego.wego.domain.plan.controller.draft.route;
 
-import com.wego.wego.domain.plan.service.TravelPlanRouteService;
+import com.wego.wego.domain.plan.service.draft.route.TravelPlanRouteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping("/travel_plan/route")
+@RequestMapping("/draft-plans")
 @RequiredArgsConstructor
-public class TravelPlanRouteController {
+public class DraftPlanRouteController {
 
     private final TravelPlanRouteService travelPlanRouteService;
 
-    @PostMapping("/temp/schedule/{route_type}/{uuid}")
+    @PostMapping("/{uuid}/{route_type}/route")
     public ResponseEntity<?> createTempScheduleRoute(@PathVariable String route_type, @PathVariable String uuid) {
         travelPlanRouteService.saveScheduleRoute(uuid, route_type);
         return ResponseEntity.ok().build();

@@ -1,10 +1,9 @@
-package com.wego.wego.domain.plan.controller;
+package com.wego.wego.domain.plan.controller.draft.place;
 
 import com.wego.wego.domain.plan.dto.TempTravelPlanAccommodationRequest;
 import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
 import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
-import com.wego.wego.domain.plan.service.TravelPlanPlaceService;
-import com.wego.wego.global.enums.PlaceType;
+import com.wego.wego.domain.plan.service.draft.place.TravelPlanPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,12 +19,19 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("/travel_plan/place")
+@RequestMapping("/draft-plans")
 @RequiredArgsConstructor
-public class TravelPlanPlaceController {
+public class DraftPlanPlaceController {
 
     private final TravelPlanPlaceService travelPlanPlaceService;
 
+    /**
+     * 여행 장소/숙소 페이지 조회 -> /places로 병합 예정
+     * @param uuid
+     * @param placeType
+     * @param pageable
+     * @return
+     */
     @GetMapping("/{uuid}/{placeType}/paged")
     public ResponseEntity<Page<TravelPlanPlaceResponse>> getPagedPlaces(
             @PathVariable String uuid,
@@ -36,14 +42,14 @@ public class TravelPlanPlaceController {
         return ResponseEntity.ok(travelPlanPlaceResponses);
     }
 
-    @PostMapping("/temp/schedule/{uuid}")
+    @PostMapping("/{uuid}/places")
     public ResponseEntity<?> createTempPlace(@PathVariable String uuid, @RequestBody List<TempTravelPlanPlaceRequest> tempTravelPlanPlaceRequests){
         travelPlanPlaceService.saveTempSchedulePlace(uuid, tempTravelPlanPlaceRequests);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/temp/schedule/{uuid}/accommodation")
-    public ResponseEntity<?> createTempAccommodation(@PathVariable String uuid, @RequestBody List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests){
+    @PostMapping("/{uuid}/accommodations")
+    public ResponseEntity<?> createTempAccommodation(@PathVariable("uuid") String uuid, @RequestBody List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests){
         travelPlanPlaceService.saveTempScheduleAccommodation(uuid, tempTravelPlanAccommodationRequests);
         return ResponseEntity.ok().build();
     }

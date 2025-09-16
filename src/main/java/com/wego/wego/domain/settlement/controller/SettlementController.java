@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/travel_plan/settlements")
+@RequestMapping("/travel-plans/{travelPlanId}/settlements")
 @RequiredArgsConstructor
 public class SettlementController {
     private final SettlementService settlementService;
@@ -23,7 +23,7 @@ public class SettlementController {
      * @param travelPlanId
      * @return
      */
-    @GetMapping("/{travelPlanId}")
+    @GetMapping
     public ResponseEntity<SettlementResponse> getTravelPlanSettlements(@PathVariable("travelPlanId") String travelPlanId) {
         SettlementResponse settlementResponse = settlementService.getAll(travelPlanId);
 
@@ -37,7 +37,7 @@ public class SettlementController {
      * @return
      */
 
-    @PostMapping("/{travelPlanId}")
+    @PostMapping
     public ResponseEntity<Integer> createTravelPlanBudget(@PathVariable("travelPlanId") String travelPlanId, @RequestBody int budget) {
         int response = settlementService.createBudget(travelPlanId, budget);
         return ResponseEntity.ok(response);
@@ -49,7 +49,7 @@ public class SettlementController {
      * @param budget
      * @return
      */
-    @PatchMapping("/{travelPlanId}")
+    @PatchMapping
     public ResponseEntity<Integer> updateTravelPlanBudget(@PathVariable("travelPlanId") String travelPlanId, @RequestBody int budget) {
         int response = settlementService.updateBudget(travelPlanId, budget);
         return ResponseEntity.ok(response);
@@ -62,7 +62,7 @@ public class SettlementController {
      * @param member
      * @return
      */
-    @PostMapping("/{travelPlanId}/items")
+    @PostMapping("/items")
     public ResponseEntity<String> createSettlementItem(@PathVariable("travelPlanId") String travelPlanId, @RequestBody SettlementItemRequest settlementItemRequest, @AuthenticationPrincipal Member member) {
         settlementService.saveSettlementItem(travelPlanId, settlementItemRequest, member);
         return ResponseEntity.ok().build();
@@ -72,7 +72,7 @@ public class SettlementController {
      * 정산하기
      * @return
      */
-    @PostMapping("/{travelPlanId}/result")
+    @PostMapping("/result")
     public ResponseEntity<SettlementResultResponse> createSettlementResult(@PathVariable("travelPlanId") String travelPlanId) {
         SettlementResultResponse settlementResultResponse = settlementService.createSettlementResult(travelPlanId);
         return ResponseEntity.ok(settlementResultResponse);
@@ -83,7 +83,7 @@ public class SettlementController {
      * @param travelPlanId
      * @return
      */
-    @GetMapping("/{travelPlanId}/result")
+    @GetMapping("/result")
     public ResponseEntity<SettlementResultResponse> getSettlementResult(@PathVariable("travelPlanId") String travelPlanId) {
         SettlementResultResponse settlementResultResponse = settlementService.getSettlementResult(travelPlanId);
         return ResponseEntity.ok(settlementResultResponse);
