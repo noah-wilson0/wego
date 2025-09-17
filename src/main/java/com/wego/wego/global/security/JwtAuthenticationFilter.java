@@ -47,8 +47,14 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
                 path.startsWith("/images/chemi") ||
 
-                path.startsWith("/draft-plans") && ("GET".equalsIgnoreCase(httpRequest.getMethod())) ||
+                path.startsWith("/draft-plans/slug")  ||
+                path.startsWith("/draft-plans") &&path.endsWith("/dates") ||
+                path.startsWith("/draft-plans") &&path.endsWith("/times") ||
+                path.startsWith("/draft-plans") &&path.endsWith("/places") ||
+                path.startsWith("/draft-plans") &&path.endsWith("/accommodations") ||
+                path.startsWith("/draft-plans") &&path.endsWith("/route") ||
 
+                path.startsWith("/draft-plans") && ("GET".equalsIgnoreCase(httpRequest.getMethod())) ||
                 path.startsWith("/feeds/all/paged")
         ) {
             log.info("permitAll한 요청");
