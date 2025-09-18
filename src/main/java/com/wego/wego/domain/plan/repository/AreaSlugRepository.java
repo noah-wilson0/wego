@@ -13,4 +13,8 @@ public interface AreaSlugRepository extends JpaRepository<AreaSlug, String> {
 
     @Query("select a.areaCodeId from AreaSlug a where a.slug=:slug")
     Optional<Integer> findAreaCodeIdBySlug(@Param("slug") String slug);
+
+
+    @Query("select a.label from AreaSlug a where a.slug = :slug")
+    Optional<String> findLabelBySlug(@Param("slug") String slug);
 }

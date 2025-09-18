@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 "/auth/me",
                                 "/chemis/result", "/chemis/all", "/images/chemi/**",
                                 "/draft-plans/slug/*",
+                                "/draft-plans/*/meta",
                                 "/draft-plans/*/dates","/draft-plans/*/times",
                                 "/draft-plans/*/*/paged",
                                 "/draft-plans/*/places", "/draft-plans/*/accommodations",

@@ -30,5 +30,4 @@ public interface CityCodeRepository extends JpaRepository<CityCode, Long> {
     List<Integer> findCityCodeIdsByAreaCodeId(@Param("areaCodeId")Integer areaCodeId);
 
 
-
 }

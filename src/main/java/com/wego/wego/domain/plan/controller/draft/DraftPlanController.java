@@ -1,6 +1,7 @@
 package com.wego.wego.domain.plan.controller.draft;
 
 import com.wego.wego.domain.member.entity.Member;
+import com.wego.wego.domain.plan.dto.DraftPlanMetaResponse;
 import com.wego.wego.domain.plan.service.draft.DraftPlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,12 @@ public class DraftPlanController {
     @PostMapping("/slug/{uuid}")
     public void saveSlug(@PathVariable String uuid, @RequestBody String slug) {
         draftPlanService.saveTempSlug(slug, uuid);
+    }
+
+    @GetMapping("{uuid}/meta")
+    public ResponseEntity<DraftPlanMetaResponse> getMeta(@PathVariable String uuid) {
+        DraftPlanMetaResponse metaResponse = draftPlanService.getSlugAndDates(uuid);
+        return ResponseEntity.ok(metaResponse);
     }
 
 

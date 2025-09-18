@@ -1,9 +1,11 @@
 package com.wego.wego.domain.plan.service.draft;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.member.service.MemberService;
+import com.wego.wego.domain.plan.dto.DraftPlanMetaResponse;
 import com.wego.wego.domain.plan.dto.TempTravelPlanResponse;
 import com.wego.wego.domain.plan.dto.TravelPlanRouteJson;
 import com.wego.wego.domain.plan.entity.TravelPlan;
@@ -11,7 +13,9 @@ import com.wego.wego.domain.plan.entity.TravelPlanDay;
 import com.wego.wego.domain.plan.entity.TravelPlanPlace;
 import com.wego.wego.domain.plan.entity.TravelPlanRoute;
 import com.wego.wego.domain.plan.repository.TravelPlanRepository;
+import com.wego.wego.domain.plan.service.support.SlugResolver;
 import com.wego.wego.external.tourapi.place.entity.Place;
+import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.enums.RouteType;
 import com.wego.wego.global.util.RedisKeyUtils;
@@ -31,9 +35,11 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DraftPlanService {
     private final PlaceService placeService;
+
     private final TravelPlanRepository travelPlanRepository;
 
     private final MemberService memberService;
+    private final SlugResolver slugResolver;
 
     private final RedisTemplate<String,String > redisTemplate;
     private final ObjectMapper objectMapper;
@@ -284,5 +290,24 @@ public class DraftPlanService {
     }
 
 
+    public DraftPlanMetaResponse getSlugAndDates(String uuid) {
+        String slugJson = redisTemplate.opsForValue().get(RedisKeyUtils.slugKey(uuid));
+        String dateJson  = redisTemplate.opsForValue().get(RedisKeyUtils.dateKey(uuid));
 
+        JsonNode slugNode = null;
+        JsonNode dateNode = null;
+        try {
+            slugNode = objectMapper.readTree(slugJson);
+            dateNode = objectMapper.readTree(dateJson );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        String slug = slugNode.get("slug").asText();
+        String regionName = slugResolver.resolveLabel(slug);
+        String startDate = dateNode.get("startDate").asText();
+        String endDate = dateNode.get("endDate").asText();
+
+        return new DraftPlanMetaResponse(regionName, startDate, endDate);
+    }
 }

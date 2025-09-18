@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CitySlugRepository extends JpaRepository<CitySlug, String> {
@@ -14,5 +15,8 @@ public interface CitySlugRepository extends JpaRepository<CitySlug, String> {
     @Query("select c.cityCodeId from CitySlug c where c.slug=:slug")
     List<Integer> findCityCodeIdsBySlug(@Param("slug") String slug);
 
+
+    @Query("select c.label from CitySlug c where c.slug = :slug")
+    Optional<String> findLabelBySlug(@Param("slug") String slug);
 
 }

@@ -7,6 +7,7 @@ import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
 import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
 import com.wego.wego.domain.plan.repository.AreaSlugRepository;
 import com.wego.wego.domain.plan.repository.CitySlugRepository;
+import com.wego.wego.domain.plan.service.support.SlugResolver;
 import com.wego.wego.external.tourapi.location.repository.CityCodeRepository;
 import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
 import com.wego.wego.global.util.RedisKeyUtils;
@@ -35,6 +36,7 @@ public class TravelPlanPlaceService {
     private final CitySlugRepository citySlugRepository;
     private final PlaceRepository placeRepository;
     private final CityCodeRepository cityCodeRepository;
+    private final SlugResolver slugResolver;
 
     public Page<TravelPlanPlaceResponse> findAll(String uuid, String placeType, Pageable pageable) {
         String slug;
@@ -48,7 +50,7 @@ public class TravelPlanPlaceService {
             throw new RuntimeException(e);
         }
         log.info(slug);
-        List<Integer> cityIds = resolveCityIds(slug);
+        List<Integer> cityIds = slugResolver.resolveCityIds(slug);
         log.info(cityIds.toString());
         return placeRepository.findByPlaceTypeAndCityCodeIdIn(placeType, cityIds, pageable)
                 .map(place -> TravelPlanPlaceResponse.builder()
@@ -87,16 +89,16 @@ public class TravelPlanPlaceService {
         redisTemplate.opsForValue().set(RedisKeyUtils.accommodationsKey(uuid), result,6, TimeUnit.HOURS);
     }
 
-    private List<Integer> resolveCityIds(String areaSlug) {
-        Optional<Integer> areaCodeIdBySlug = areaSlugRepository.findAreaCodeIdBySlug(areaSlug);
-
-        if (areaCodeIdBySlug.isPresent()) {
-            return cityCodeRepository.findCityCodeIdsByAreaCodeId(areaCodeIdBySlug.get());
-
-        } else {
-            return citySlugRepository.findCityCodeIdsBySlug(areaSlug);
-        }
-    }
+//    private List<Integer> resolveCityIds(String areaSlug) {
+//        Optional<Integer> areaCodeIdBySlug = areaSlugRepository.findAreaCodeIdBySlug(areaSlug);
+//
+//        if (areaCodeIdBySlug.isPresent()) {
+//            return cityCodeRepository.findCityCodeIdsByAreaCodeId(areaCodeIdBySlug.get());
+//
+//        } else {
+//            return citySlugRepository.findCityCodeIdsBySlug(areaSlug);
+//        }
+//    }
 
 
 }
