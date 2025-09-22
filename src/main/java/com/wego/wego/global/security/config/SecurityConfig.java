@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/sign-in","/members/sign-up",
                                 "/auth/me",
                                 "/chemis/result", "/chemis/all", "/images/chemi/**",
+                                "/places/search",
                                 "/draft-plans/slug/*",
                                 "/draft-plans/*/meta",
                                 "/draft-plans/*/dates","/draft-plans/*/times",
@@ -51,7 +52,8 @@ public class SecurityConfig {
                                 "/draft-plans/*/places", "/draft-plans/*/accommodations",
                                 "/draft-plans/*/*/route",
                                 "/draft-plans/*/auto-schedule",
-                                "/travel-plans/*/share",
+                                "/travel-plans/*", //공유 일정 조회
+                                "/travel-share-plans/*/settlements/result", //공유자의 정산하기는 비회원도 가능
                                 "/feeds/all/paged",
                                 "/feeds/{feed_id}/comments").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/draft-plans/*").permitAll()
@@ -60,11 +62,11 @@ public class SecurityConfig {
                                 "/me/change-info", "/me/chemi",
                                 "/me/feeds", "/me/travel-plans","/me/travel-plans/imminent",
                                 "/travel-plans/*/me",
+                                "/travel-plans/*/share",
                                 "/chemis/similar","/chemis/labels",
 
                                 "/feeds/init/**",
-                                "/travel-plans/*/settlements/result",
-                                "/travel-share-plans/*/settlements/result").hasRole("USER")
+                                "/travel-plans/*/settlements/result").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/me",
                                 "/travel-plans/*/settlements","/travel-share-plans/*/settlements",

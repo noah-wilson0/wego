@@ -1,6 +1,5 @@
 package com.wego.wego.global.security;
 
-import com.wego.wego.domain.plan.service.GeminiRequestService;
 import com.wego.wego.global.util.RedisKeyUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +21,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private final JwtProvider jwtProvider;
     private final RedisTemplate<String, String> redisTemplate;
-    private String token=null;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -48,6 +46,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 path.startsWith("/images/chemi") ||
 
                 path.startsWith("/draft-plans/slug")  ||
+                path.startsWith("/places/search")  ||
                 path.startsWith("/draft-plans/") &&path.endsWith("/meta") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/dates") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/times") ||
@@ -56,13 +55,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 path.startsWith("/draft-plans") &&path.endsWith("/route") ||
 
                 path.startsWith("/draft-plans") && ("GET".equalsIgnoreCase(httpRequest.getMethod())) ||
+                path.startsWith("/travel-share-plans") && path.endsWith("/settlements/result") ||
+
                 path.startsWith("/feeds/all/paged")
         ) {
             log.info("permitAll한 요청");
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         } else {
-
+            String token = null;
             //토큰 가져오기
             if (httpRequest.getCookies() != null) {
                 for (jakarta.servlet.http.Cookie cookie : httpRequest.getCookies()) {
@@ -82,7 +83,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
             // AT 블랙리스트검사
             if (token != null && jwtProvider.validateToken(token)) {
-                if (redisTemplate.hasKey(RedisKeyUtils.blackListKey(jwtProvider.getAuthentication(token).getName()))) {
+                if (redisTemplate.hasKey(RedisKeyUtils.blackListKey(jwtProvider.getAuthentication(token).getName()))||
+                        redisTemplate.hasKey(RedisKeyUtils.logoutBlackListKey(jwtProvider.getAuthentication(token).getName()))) {
                     log.info("blacklist 확인 실행");
                     HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
                     SecurityContextHolder.clearContext();

@@ -2,7 +2,7 @@ package com.wego.wego.domain.plan.controller.draft.place;
 
 import com.wego.wego.domain.plan.dto.TempTravelPlanAccommodationRequest;
 import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
-import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
+import com.wego.wego.domain.plan.dto.DraftPlanPlaceResponse;
 import com.wego.wego.domain.plan.service.draft.place.TravelPlanPlaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,14 +33,16 @@ public class DraftPlanPlaceController {
      * @return
      */
     @GetMapping("/{uuid}/{placeType}/paged")
-    public ResponseEntity<Page<TravelPlanPlaceResponse>> getPagedPlaces(
+    public ResponseEntity<Page<DraftPlanPlaceResponse>> getPagedPlaces(
             @PathVariable String uuid,
             @PathVariable String placeType,
             @PageableDefault(size=20, sort = {"averageRating", "likeCount"}, direction = Sort.Direction.DESC)Pageable pageable){
 
-        Page<TravelPlanPlaceResponse> travelPlanPlaceResponses = travelPlanPlaceService.findAll(uuid, placeType, pageable);
+        Page<DraftPlanPlaceResponse> travelPlanPlaceResponses = travelPlanPlaceService.findAll(uuid, placeType, pageable);
         return ResponseEntity.ok(travelPlanPlaceResponses);
     }
+
+
 
     @PostMapping("/{uuid}/places")
     public ResponseEntity<?> createTempPlace(@PathVariable String uuid, @RequestBody List<TempTravelPlanPlaceRequest> tempTravelPlanPlaceRequests){

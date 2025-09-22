@@ -1,14 +1,15 @@
 package com.wego.wego.domain.plan.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.With;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-public record TempTravelPlanResponse(
-        String slug,
+public record DraftTravelPlanResponse(
+        @With String slug,
         LocalDate start_date,
         LocalDate end_date,
         List<DaySchedule> days,
@@ -31,6 +32,8 @@ public record TempTravelPlanResponse(
             String title,
             String image,
             int sequence,
+            double longitude,
+            double latitude,
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
             LocalTime start_time,
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
@@ -43,6 +46,8 @@ public record TempTravelPlanResponse(
             String title,
             String image,
             int sequence,
+            double longitude,
+            double latitude,
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
             LocalTime start_time,
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
@@ -60,5 +65,6 @@ public record TempTravelPlanResponse(
             String destination,
             int duration
     ) {}
+
 }
 

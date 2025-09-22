@@ -81,10 +81,6 @@ public class SettlementShareService {
 
         TravelPlan travelPlan = travelPlanShareRepository.findTravelPlanByToken(ShareTokenUtil.sha256Hex(token), LocalDate.now())
                 .orElseThrow(() -> new RuntimeException("travel plan not found"));
-
-        Settlement findSettlement = settlementRepository.findWithItemsByTravelPlanId(Long.valueOf(travelPlan.getId()))
-                .orElseThrow(() -> new RuntimeException("Settlement not found for travelPlanId=" + travelPlan.getId()));
-
         settlementRepository.save(Settlement.builder()
                 .travelPlan(travelPlan)
                 .budget(budget)

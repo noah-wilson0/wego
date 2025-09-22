@@ -27,10 +27,9 @@ public class TravelPlanShareController {
     }
 
     @GetMapping("/{token}")
-    public ResponseEntity<?> getShareTravelPlan(@PathVariable String token){
-        TravelPlan shareTravelPlan = travelPlanShareService.getShareTravelPlan(token);
-        TravelPlanResponse travelPlanResponse = TravelPlanResponse.from(shareTravelPlan);
-        return ResponseEntity.ok().body(travelPlanResponse);
+    public ResponseEntity<TravelPlanResponse> getShareTravelPlan(@PathVariable String token){
+        TravelPlanResponse shareTravelPlan = travelPlanShareService.getShareTravelPlan(token);
+        return ResponseEntity.ok().body(shareTravelPlan);
     }
 
 }

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.plan.dto.TempTravelPlanAccommodationRequest;
 import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
-import com.wego.wego.domain.plan.dto.TravelPlanPlaceResponse;
+import com.wego.wego.domain.plan.dto.DraftPlanPlaceResponse;
 import com.wego.wego.domain.plan.repository.AreaSlugRepository;
 import com.wego.wego.domain.plan.repository.CitySlugRepository;
 import com.wego.wego.domain.plan.service.support.SlugResolver;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -38,7 +37,7 @@ public class TravelPlanPlaceService {
     private final CityCodeRepository cityCodeRepository;
     private final SlugResolver slugResolver;
 
-    public Page<TravelPlanPlaceResponse> findAll(String uuid, String placeType, Pageable pageable) {
+    public Page<DraftPlanPlaceResponse> findAll(String uuid, String placeType, Pageable pageable) {
         String slug;
         String slugJson = redisTemplate.opsForValue().get(RedisKeyUtils.slugKey(uuid));
         log.info(slugJson);
@@ -53,12 +52,14 @@ public class TravelPlanPlaceService {
         List<Integer> cityIds = slugResolver.resolveCityIds(slug);
         log.info(cityIds.toString());
         return placeRepository.findByPlaceTypeAndCityCodeIdIn(placeType, cityIds, pageable)
-                .map(place -> TravelPlanPlaceResponse.builder()
+                .map(place -> DraftPlanPlaceResponse.builder()
                         .contentId(place.getContentId())
                         .title(place.getTitle())
                         .image(place.getImage())
                         .placeType(place.getPlaceType())
                         .addr(place.getAddr1())
+                        .longitude(Double.parseDouble(place.getLongitude()))
+                        .latitude(Double.parseDouble(place.getLatitude()))
                         .averageRating(place.getAverageRating())
                         .likeCount(place.getLikeCount())
                         .build());

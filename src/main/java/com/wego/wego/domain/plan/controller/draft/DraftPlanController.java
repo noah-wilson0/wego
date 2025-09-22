@@ -2,6 +2,7 @@ package com.wego.wego.domain.plan.controller.draft;
 
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.plan.dto.DraftPlanMetaResponse;
+import com.wego.wego.domain.plan.dto.DraftTravelPlanResponse;
 import com.wego.wego.domain.plan.service.draft.DraftPlanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +36,9 @@ public class DraftPlanController {
      * @return
      */
     @GetMapping("/{uuid}")
-    public ResponseEntity<String> getTempSchedule(@PathVariable String uuid) {
+    public ResponseEntity<DraftTravelPlanResponse> getTempSchedule(@PathVariable String uuid) {
         log.info("/draft-plans/{}", uuid);
-        String tempTravelPlan = draftPlanService.getTempTravelPlan(uuid);
+        DraftTravelPlanResponse tempTravelPlan = draftPlanService.getTempTravelPlan(uuid);
         return ResponseEntity.ok().body(tempTravelPlan);
 
     }

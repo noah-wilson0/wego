@@ -60,7 +60,8 @@ public class AuthController {
      */
     @PostMapping("/sign-out")
     public ResponseEntity<?> logout(@CookieValue(value = "refreshToken", required = false) String refreshToken,
-                                    @CookieValue(value = "accessToken", required = false) String accessToken) {
+                                    @CookieValue(value = "accessToken", required = false) String accessToken,
+                                    @AuthenticationPrincipal Member member) {
         if (accessToken == null && refreshToken == null) {
             log.info("로그아웃 실패");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -69,12 +70,12 @@ public class AuthController {
 
         // 2. AT 블랙리스트 등록
         if (accessToken != null) {
-            jwtBlacklistService.addLogoutBlacklistToken(accessToken,"logout");
+            jwtBlacklistService.addLogoutBlacklistToken(accessToken,member.getUsername());
         }
 
         // 3. RT 블랙리스트 등록
         if (refreshToken != null) {
-            jwtBlacklistService.addLogoutBlacklistToken(refreshToken,"logout");
+            jwtBlacklistService.addLogoutBlacklistToken(refreshToken,member.getUsername());
         }
         log.info("로그아웃 완료");
         return ResponseEntity.ok()
