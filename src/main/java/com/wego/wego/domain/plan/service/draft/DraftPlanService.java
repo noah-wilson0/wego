@@ -6,8 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.member.service.MemberService;
 import com.wego.wego.domain.plan.dto.DraftPlanMetaResponse;
-import com.wego.wego.domain.plan.dto.DraftTravelPlanResponse;
-import com.wego.wego.domain.plan.dto.TravelPlanRouteJson;
+import com.wego.wego.domain.plan.dto.DraftPlanResponse;
 import com.wego.wego.domain.plan.entity.TravelPlan;
 import com.wego.wego.domain.plan.entity.TravelPlanDay;
 import com.wego.wego.domain.plan.entity.TravelPlanPlace;
@@ -47,103 +46,20 @@ public class DraftPlanService {
         redisTemplate.opsForValue().set(RedisKeyUtils.slugKey(uuid), slug,6, TimeUnit.HOURS);
     }
 
-    public DraftTravelPlanResponse getTempTravelPlan(String uuid) {
-
-        String routes = redisTemplate.opsForValue().get(RedisKeyUtils.routeKey(uuid));
-        TravelPlanRouteJson travelPlanRouteJson;
-        try {
-            travelPlanRouteJson = objectMapper.readValue(routes, TravelPlanRouteJson.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        List<DraftTravelPlanResponse.DaySchedule> newDays=new ArrayList<>();
-        for (int i = 0; i < travelPlanRouteJson.days().size(); i++) {
-            TravelPlanRouteJson.DaySchedule daySchedule = travelPlanRouteJson.days().get(i);
-
-            //places 생성
-            List<DraftTravelPlanResponse.PlaceItem> newPlaces=new ArrayList<>();
-            for (int j = 0; j < daySchedule.places().size(); j++) {
-                TravelPlanRouteJson.PlaceItem placeItem = daySchedule.places().get(j);
-                Place place = placeService.findByContentId(placeItem.content_id()).get();
-                newPlaces.add(new DraftTravelPlanResponse.PlaceItem(
-                        placeItem.content_id(),
-                        place.getPlaceType(),
-                        place.getTitle(),
-                        place.getImage(),
-                        placeItem.sequence(),
-                        Double.valueOf(place.getLongitude()),
-                        Double.valueOf(place.getLatitude()),
-                        placeItem.start_time(),
-                        placeItem.end_time()
-                ));
+    public DraftPlanResponse getTempTravelPlan(String uuid) {
+        // 1) 신규 포맷 우선: tempScheduleKey
+        String cached = redisTemplate.opsForValue().get(RedisKeyUtils.tempScheduleKey(uuid));
+        DraftPlanResponse draft = null;
+        if (cached != null) {
+            try {
+                draft = objectMapper.readValue(cached, DraftPlanResponse.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
 
-            //accommodation 생성
-            DraftTravelPlanResponse.AccommodationItem newAccommodationItem = null;
-
-            if (daySchedule.accommodation() != null) {
-                Place accommodation = placeService.findByContentId(daySchedule.accommodation().content_id()).get();
-                newAccommodationItem=new DraftTravelPlanResponse.AccommodationItem(
-                        daySchedule.accommodation().content_id(),
-                        accommodation.getPlaceType(),
-                        accommodation.getTitle(),
-                        accommodation.getImage(),
-                        daySchedule.accommodation().sequence(),
-                        Double.valueOf(accommodation.getLongitude()),
-                        Double.valueOf(accommodation.getLatitude()),
-                        daySchedule.accommodation().start_time(),
-                        daySchedule.accommodation().end_time()
-                );
-            }
-
-            //DaySchedule 추가
-            newDays.add(new DraftTravelPlanResponse.DaySchedule(
-                    daySchedule.date(),
-                    daySchedule.start_time(),
-                    daySchedule.end_time(),
-                    newPlaces,
-                    newAccommodationItem
-            ));
         }
+        return draft.withSlug(slugResolver.resolveLabel(draft.slug()));
 
-        List<DraftTravelPlanResponse.RouteInfo> newRoutes=new ArrayList<>();
-        for (int i = 0; i < travelPlanRouteJson.routes().size(); i++) {
-            TravelPlanRouteJson.RouteInfo routeInfo = travelPlanRouteJson.routes().get(i);
-
-            Map<LocalDate,List<DraftTravelPlanResponse.RouteDetail>> newDailyRoutes=new HashMap<>();
-            List<DraftTravelPlanResponse.RouteDetail> newRouteDetails = new ArrayList<>();
-
-            List<TravelPlanRouteJson.RouteDetail> routeDetails = routeInfo.daily_route().get(travelPlanRouteJson.days().get(i).date());
-            for (int j = 0; j < routeDetails.size(); j++) {
-                DraftTravelPlanResponse.RouteDetail newRouteDetail = new DraftTravelPlanResponse.RouteDetail(
-                        routeDetails.get(j).sequence(),
-                        routeDetails.get(j).origin(),
-                        routeDetails.get(j).destination(),
-                        routeDetails.get(j).duration()
-                );
-                newRouteDetails.add(newRouteDetail);
-            }
-            newDailyRoutes.put(travelPlanRouteJson.days().get(i).date(),newRouteDetails);
-            newRoutes.add(new DraftTravelPlanResponse.RouteInfo(routeInfo.route_type(), newDailyRoutes));
-        }
-
-        DraftTravelPlanResponse draftTravelPlanResponse =new DraftTravelPlanResponse(
-                travelPlanRouteJson.slug(),
-                travelPlanRouteJson.start_date(),
-                travelPlanRouteJson.end_date(),
-                newDays,
-                newRoutes
-        );
-        DraftTravelPlanResponse returnValue = draftTravelPlanResponse.withSlug(slugResolver.resolveLabel(travelPlanRouteJson.slug()));
-        String response;
-        try {
-            response = objectMapper.writeValueAsString(draftTravelPlanResponse);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        redisTemplate.opsForValue().set(RedisKeyUtils.tempScheduleKey(uuid), response,6, TimeUnit.HOURS);
-
-        return returnValue;
     }
 
     @Transactional
@@ -153,9 +69,9 @@ public class DraftPlanService {
             throw new IllegalStateException("임시 일정이 없습니다. uuid=" + uuid);
         }
 
-        DraftTravelPlanResponse draftTravelPlanResponse;
+        DraftPlanResponse draftPlanResponse;
         try {
-            draftTravelPlanResponse = objectMapper.readValue(json, DraftTravelPlanResponse.class);
+            draftPlanResponse = objectMapper.readValue(json, DraftPlanResponse.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("임시 일정 파싱 실패", e);
         }
@@ -164,9 +80,9 @@ public class DraftPlanService {
         // ↓ 이 managed를 쓰세요
         // 1) plan 만들기 (title, createdAt은 엔티티 default 활용)
         TravelPlan plan = TravelPlan.builder()
-                .slug(draftTravelPlanResponse.slug())
-                .startDate(draftTravelPlanResponse.start_date())
-                .endDate(draftTravelPlanResponse.end_date())
+                .slug(draftPlanResponse.slug())
+                .startDate(draftPlanResponse.start_date())
+                .endDate(draftPlanResponse.end_date())
                 .member(managed)
                 .build();
 
@@ -174,8 +90,8 @@ public class DraftPlanService {
         List<TravelPlanDay> travelPlanDays = new ArrayList<>();
         Map<LocalDate, TravelPlanDay> dayByDate = new HashMap<>();
 
-        for (int i = 0; i < draftTravelPlanResponse.days().size(); i++) {
-            DraftTravelPlanResponse.DaySchedule daySchedule = draftTravelPlanResponse.days().get(i);
+        for (int i = 0; i < draftPlanResponse.days().size(); i++) {
+            DraftPlanResponse.DaySchedule daySchedule = draftPlanResponse.days().get(i);
 
             // ✅ 부모 plan을 Day에 즉시 연결 (FK 세팅)
             TravelPlanDay travelPlanDay = TravelPlanDay.builder()
@@ -189,7 +105,7 @@ public class DraftPlanService {
 
             // 장소들
             for (int j = 0; j < daySchedule.places().size(); j++) {
-                DraftTravelPlanResponse.PlaceItem placeItem = daySchedule.places().get(j);
+                DraftPlanResponse.PlaceItem placeItem = daySchedule.places().get(j);
 
                 Place place = placeService.findByContentId(placeItem.content_id())
                         .orElseThrow(() -> new RuntimeException("장소 없음: " + placeItem.content_id()));
@@ -207,7 +123,7 @@ public class DraftPlanService {
 
             // 숙소(있을 때만)
             if (daySchedule.accommodation() != null) {
-                DraftTravelPlanResponse.AccommodationItem acc = daySchedule.accommodation();
+                DraftPlanResponse.AccommodationItem acc = daySchedule.accommodation();
 
                 Place accPlace = placeService.findByContentId(acc.content_id())
                         .orElseThrow(() -> new RuntimeException("숙소 없음: " + acc.content_id()));
@@ -231,8 +147,8 @@ public class DraftPlanService {
         }
 
         // 3) routes
-        for (int i = 0; i < draftTravelPlanResponse.routes().size(); i++) {
-            DraftTravelPlanResponse.RouteInfo routeInfo = draftTravelPlanResponse.routes().get(i);
+        for (int i = 0; i < draftPlanResponse.routes().size(); i++) {
+            DraftPlanResponse.RouteInfo routeInfo = draftPlanResponse.routes().get(i);
 
             RouteType routeType;
             try {
@@ -241,7 +157,7 @@ public class DraftPlanService {
                 throw new IllegalArgumentException("알 수 없는 route_type: " + routeInfo.route_type());
             }
 
-            for (Map.Entry<LocalDate, List<DraftTravelPlanResponse.RouteDetail>> entry
+            for (Map.Entry<LocalDate, List<DraftPlanResponse.RouteDetail>> entry
                     : routeInfo.daily_route().entrySet()) {
 
                 LocalDate date = entry.getKey();
@@ -250,9 +166,9 @@ public class DraftPlanService {
                     throw new IllegalStateException("해당 날짜의 Day 없음: " + date);
                 }
 
-                List<DraftTravelPlanResponse.RouteDetail> details = entry.getValue();
+                List<DraftPlanResponse.RouteDetail> details = entry.getValue();
                 for (int k = 0; k < details.size(); k++) {
-                    DraftTravelPlanResponse.RouteDetail rd = details.get(k);
+                    DraftPlanResponse.RouteDetail rd = details.get(k);
 
                     Place origin = placeService.findByContentId(rd.origin())
                             .orElseThrow(() -> new RuntimeException("출발지 없음: " + rd.origin()));

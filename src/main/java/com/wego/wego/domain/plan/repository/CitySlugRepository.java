@@ -15,6 +15,11 @@ public interface CitySlugRepository extends JpaRepository<CitySlug, String> {
     @Query("select c.cityCodeId from CitySlug c where c.slug=:slug")
     List<Integer> findCityCodeIdsBySlug(@Param("slug") String slug);
 
+    @Query("select c.cityCodeId from CitySlug c where c.label=:label")
+    List<Integer> findCityCodeIdsByLabel(@Param("label") String label);
+
+    @Query("select c.slug from CitySlug c where c.label = :label")
+    Optional<String> findSlugByLabel(@Param("label") String label);
 
     @Query("select c.label from CitySlug c where c.slug = :slug")
     Optional<String> findLabelBySlug(@Param("slug") String slug);

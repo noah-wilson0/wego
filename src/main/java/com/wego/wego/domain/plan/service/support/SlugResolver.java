@@ -21,9 +21,20 @@ public class SlugResolver {
                 .orElseGet(() -> citySlugRepository.findCityCodeIdsBySlug(slug));
     }
 
+    public String resolveSlugByLabel(String label) {
+        return areaSlugRepository.findSlugByLabel(label)
+                .orElseGet(() -> citySlugRepository.findSlugByLabel(label)
+                        .orElse("Unknown"));
+    }
+
     public String resolveLabel(String slug) {
         return areaSlugRepository.findLabelBySlug(slug)
                 .orElseGet(() -> citySlugRepository.findLabelBySlug(slug)
                         .orElse("Unknown"));
+    }
+    public List<Integer> resolveCityIdsByLabel(String label) {
+        return areaSlugRepository.findAreaCodeIdByLabel(label)
+                .map(cityCodeRepository::findCityCodeIdsByAreaCodeId)
+                .orElseGet(() -> citySlugRepository.findCityCodeIdsByLabel(label));
     }
 }

@@ -8,6 +8,8 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.wego.wego.domain.plan.dto.DraftPlanPlaceResponse;
+import com.wego.wego.domain.plan.dto.draft.auto.GeminiPlaceItemResponse;
+import com.wego.wego.external.tourapi.place.entity.Place;
 import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,6 +66,38 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
         return PageableExecutionUtils.getPage(places,pageable,count::fetchCount);
     }
 
+    @Override
+    public Page<GeminiPlaceItemResponse> searchGeminiPlaceItemResponseByTitleInCities(List<String> placeTypes, List<Long> cityCodeIds, Pageable pageable) {
+        List<GeminiPlaceItemResponse> places = jpaQueryFactory
+                .select(Projections.constructor(GeminiPlaceItemResponse.class,
+                        place.contentId,
+                        place.title,
+                        place.image,
+                        place.addr1,
+                        toDoubleOrZero(place.longitude),
+                        toDoubleOrZero(place.latitude),
+                        place.averageRating,
+                        place.likeCount))
+                .distinct()
+                .from(place)
+                .where(placeTypeIn(placeTypes),
+                        cityCodeIn(cityCodeIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(place.averageRating.desc(), place.likeCount.desc())
+                .fetch();
+
+        JPAQuery<Long> count = jpaQueryFactory
+                .select(place.id)
+                .from(place)
+                .where(placeTypeIn(placeTypes),
+                        cityCodeIn(cityCodeIds));
+        return PageableExecutionUtils.getPage(places,pageable,count::fetchCount);
+
+    }
+
+
+
     private static BooleanExpression cityCodeIn(List<Long> cityCodeIds) {
         return CollectionUtils.isEmpty(cityCodeIds) ? null : place.cityCode.cityCodeId.in(cityCodeIds);
     }
@@ -85,4 +119,34 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
         );
     }
 
+    private static NumberExpression<Double> similarityExpr(StringPath field, String title) {
+        // similarity(field, :title)
+        return Expressions.numberTemplate(
+                Double.class,
+                "similarity({0}, {1})",
+                field, Expressions.constant(title)
+        );
+    }
+
+    /**
+     * 하버사인(acos) 기반 거리 (km)
+     * acos 도메인 문제를 피하기 위해 least/greatest로 클램프
+     */
+    private static NumberExpression<Double> distanceKmExpr(
+            NumberExpression<Double> lat1,
+            NumberExpression<Double> lon1,
+            double lat2, double lon2
+    ) {
+        return Expressions.numberTemplate(
+                Double.class,
+                "6371 * acos(least(1.0, greatest(-1.0, " +
+                        "cos(radians({0})) * cos(radians({1})) * cos(radians({2}) - radians({3})) + " +
+                        "sin(radians({0})) * sin(radians({1}))" +
+                        ")))",
+                Expressions.constant(lat2),
+                lat1,
+                lon1,
+                Expressions.constant(lon2)
+        );
+    }
 }

@@ -30,4 +30,5 @@ public class PlaceController {
         return ResponseEntity.ok(search);
     }
 
+
 }

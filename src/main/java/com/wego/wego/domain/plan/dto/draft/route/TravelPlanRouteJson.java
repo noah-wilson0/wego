@@ -1,4 +1,4 @@
-package com.wego.wego.domain.plan.dto;
+package com.wego.wego.domain.plan.dto.draft.route;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

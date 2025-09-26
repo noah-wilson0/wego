@@ -50,6 +50,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 path.startsWith("/draft-plans/") &&path.endsWith("/meta") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/dates") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/times") ||
+//                path.startsWith("/draft-plans") &&path.endsWith("/auto-schedule") || //테스트할떄만
                 path.startsWith("/draft-plans") &&path.endsWith("/places") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/accommodations") ||
                 path.startsWith("/draft-plans") &&path.endsWith("/route") ||
@@ -57,7 +58,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 path.startsWith("/draft-plans") && ("GET".equalsIgnoreCase(httpRequest.getMethod())) ||
                 path.startsWith("/travel-share-plans") && path.endsWith("/settlements/result") ||
 
-                path.startsWith("/feeds/all/paged")
+                path.startsWith("/feeds/all/paged") ||
+                path.startsWith("/ai/places")
         ) {
             log.info("permitAll한 요청");
             filterChain.doFilter(servletRequest, servletResponse);

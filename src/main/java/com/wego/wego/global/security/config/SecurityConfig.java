@@ -51,11 +51,12 @@ public class SecurityConfig {
                                 "/draft-plans/*/*/paged",
                                 "/draft-plans/*/places", "/draft-plans/*/accommodations",
                                 "/draft-plans/*/*/route",
-                                "/draft-plans/*/auto-schedule",
+//                                "/draft-plans/*/auto-schedule", //테스트 할떄만
                                 "/travel-plans/*", //공유 일정 조회
                                 "/travel-share-plans/*/settlements/result", //공유자의 정산하기는 비회원도 가능
                                 "/feeds/all/paged",
-                                "/feeds/{feed_id}/comments").permitAll()
+                                "/feeds/{feed_id}/comments",
+                                "/ai/places").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/draft-plans/*").permitAll()
                         .requestMatchers("/auth/sign-out",
                                 "/me/check-password", "/me/change-password",
@@ -66,7 +67,8 @@ public class SecurityConfig {
                                 "/chemis/similar","/chemis/labels",
 
                                 "/feeds/init/**",
-                                "/travel-plans/*/settlements/result").hasRole("USER")
+                                "/travel-plans/*/settlements/result",
+                                "/draft-plans/*/auto-schedule").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/me",
                                 "/travel-plans/*/settlements","/travel-share-plans/*/settlements",

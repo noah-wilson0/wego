@@ -1,6 +1,5 @@
 package com.wego.wego.domain.member.service;
 
-import com.wego.wego.domain.member.dto.MemberDetailResponse;
 import com.wego.wego.domain.member.dto.SignupRequest;
 import com.wego.wego.domain.member.entity.Member;
 import com.wego.wego.domain.member.repository.MemberRepository;

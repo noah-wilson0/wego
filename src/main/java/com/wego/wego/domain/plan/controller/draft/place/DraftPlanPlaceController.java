@@ -50,6 +50,12 @@ public class DraftPlanPlaceController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 프론트에서 자체적으로 마지막날 숙소를 제외한 상태로 들어옴
+     * @param uuid
+     * @param tempTravelPlanAccommodationRequests
+     * @return
+     */
     @PostMapping("/{uuid}/accommodations")
     public ResponseEntity<?> createTempAccommodation(@PathVariable("uuid") String uuid, @RequestBody List<TempTravelPlanAccommodationRequest> tempTravelPlanAccommodationRequests){
         travelPlanPlaceService.saveTempScheduleAccommodation(uuid, tempTravelPlanAccommodationRequests);

@@ -28,6 +28,16 @@ public interface PlaceRepository extends JpaRepository<Place, Long>, PlaceQueryR
 """, nativeQuery = true)
     Optional<Place> findMostSimilarTitleInCity(@Param("title") String title, @Param("cityCodeId") Long cityCodeId);
 
+
+    @Query(value = """
+    SELECT *
+    FROM place
+    WHERE similarity(title, :title) > 0.3
+    ORDER BY similarity(title, :title) DESC
+    LIMIT 1
+""", nativeQuery = true)
+    Optional<Place> findMostSimilarTitle(@Param("title") String title);
+
     //ai db 비교 테스트용
     List<Place> findByTitleContaining(String title);
 
