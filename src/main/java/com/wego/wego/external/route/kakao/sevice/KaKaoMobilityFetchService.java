@@ -1,5 +1,7 @@
 package com.wego.wego.external.route.kakao.sevice;
 
+import com.wego.wego.domain.plan.dto.draft.route.RoutingSummary;
+import com.wego.wego.external.route.exception.KakaoRouteException;
 import com.wego.wego.external.route.kakao.config.KaKaoProperties;
 import com.wego.wego.external.route.kakao.dto.KaKaoMobilityResponse;
 import com.wego.wego.external.route.dto.RouteResult;
@@ -9,7 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.http.HttpStatusCode;
+import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 /**
  *
     * 일정 데이터는
@@ -20,13 +27,20 @@ import org.springframework.web.reactive.function.client.WebClient;
     * 일정 -1만큼 마지막 노드는 숙소가 추가된다.
     *  이를 만족하는 객체를 만든 후 이것을 getCarKaKaoMobility에 넣고 루프를 돌려서 장소쌍마다 fetchKaKaoMobilityData을 돌린다.
  */
+
+
 @Slf4j
 @Service
 public class KaKaoMobilityFetchService {
+
     @Qualifier("kaKaoMobilityWebClient")
     private final WebClient webClient;
-
     private final KaKaoProperties kaKaoProperties;
+
+    // 필요하면 문서 보고 계속 보강하면 됨
+    private static final Map<Integer, String> CODE_MEANING = Map.of(
+            0, "SUCCESS" // (예) 0=성공
+    );
 
     public KaKaoMobilityFetchService(
             @Qualifier("kaKaoMobilityWebClient") WebClient webClient,
@@ -36,60 +50,113 @@ public class KaKaoMobilityFetchService {
         this.kaKaoProperties = kaKaoProperties;
     }
 
-
     public RouteResult fetchKaKaoMobilityData(Place originPlace, Place destinationPlace) {
-        log.info("originPlace:{%s}, {%s}".formatted(originPlace.getLongitude(),originPlace.getLatitude()));
-        log.info("destinationPlace:{%s}, {%s}".formatted(destinationPlace.getLongitude(),destinationPlace.getLatitude()));
-        KaKaoCoordinateFormatter kaKaoCoordinateFormatter = new KaKaoCoordinateFormatter();
-        String origin = kaKaoCoordinateFormatter.format(originPlace.getLongitude(), originPlace.getLatitude(), originPlace.getTitle());
-        String destination = kaKaoCoordinateFormatter.format(destinationPlace.getLongitude(), destinationPlace.getLatitude(), destinationPlace.getTitle());
+        final String originDbg = dbg(originPlace);
+        final String destDbg   = dbg(destinationPlace);
+
+        KaKaoCoordinateFormatter fmt = new KaKaoCoordinateFormatter();
+        String origin = fmt.format(originPlace.getLongitude(), originPlace.getLatitude(), originPlace.getTitle());
+        String destination = fmt.format(destinationPlace.getLongitude(), destinationPlace.getLatitude(), destinationPlace.getTitle());
+
+        log.info("[Kakao] Request route: origin={}, destination={}", originDbg, destDbg);
 
         try {
-            KaKaoMobilityResponse kaKaoMobilityResponse = getKaKaoMobilityFromApi(origin, destination);
-            log.info("경로 생성 완료 ");
-            if (kaKaoMobilityResponse.routes() != null && !kaKaoMobilityResponse.routes().isEmpty()) {
-                KaKaoMobilityResponse.Route route = kaKaoMobilityResponse.routes().get(0);
-                if (route.result_code() == 0) {
-                    log.info("경로 반환 성공");
-                    KaKaoMobilityResponse.Summary summary = route.summary();
-                    return RouteResult.builder()
-                            .originId(originPlace.getContentId())
-                            .destinationId(destinationPlace.getContentId())
-                            .fare(summary.fare().taxi())
-                            .distance(summary.distance())
-                            .duration(summary.duration()).build();
-                } else {
-                    throw new RuntimeException("카카오 경로 요청 실패");
-                }
-            } else {
-                throw new RuntimeException("카카오 API 응답에 routes가 비어 있습니다.");
-            }
-        }catch (RuntimeException e) {
-            throw new RuntimeException("카카오 경로 요청 중 오류 발생", e);
-        }
+            KaKaoMobilityResponse res = getKaKaoMobilityFromApi(origin, destination);
 
+            if (res == null || res.routes() == null || res.routes().isEmpty()) {
+                log.error("[Kakao] Empty routes. origin={}, destination={}", originDbg, destDbg);
+                throw new RuntimeException("카카오 API 응답에 routes가 비었습니다");
+            }
+
+            KaKaoMobilityResponse.Route route = res.routes().get(0);
+            int code = route.result_code();
+            String msg = route.result_msg();
+
+            /**
+             * 104 code는 가까운 5m이내라서 경로 탐색 불가능함
+             *  -> 0처리
+             */
+            if (code == 104) {
+                return RouteResult.builder()
+                        .originId(originPlace.getContentId())
+                        .destinationId(destinationPlace.getContentId())
+                        .fare(0)
+                        .distance(0)
+                        .duration(0)
+                        .build();
+            }
+            /**
+             * 105/106 error code는 출발지/목적지가 문제이므로 상위 클래스로 예외를 전파시키도록 함
+             */
+            else if (code == 105 || code == 106) {
+                throw new KakaoRouteException(code, msg, originPlace.getContentId(), destinationPlace.getContentId());
+            }
+            else if (code != 0) {
+                log.error("[Kakao] Route failed. result_code={}, meaning={}, result_msg={}, origin={}, destination={}",
+                        code, CODE_MEANING.getOrDefault(code, "UNKNOWN"), msg, originDbg, destDbg);
+                throw new RuntimeException("카카오 경로 요청 실패 (code=" + code + ", msg=" + msg + ")");
+            }
+
+            KaKaoMobilityResponse.Summary s = route.summary();
+            log.info("[Kakao] Route OK. duration={}, distance={}, taxiFare={}, origin={}, destination={}",
+                    s.duration(), s.distance(), s.fare() != null ? s.fare().taxi() : null, originDbg, destDbg);
+
+            return RouteResult.builder()
+                    .originId(originPlace.getContentId())
+                    .destinationId(destinationPlace.getContentId())
+                    .fare(s.fare() != null ? s.fare().taxi() : 0)
+                    .distance(s.distance())
+                    .duration(s.duration())
+                    .build();
+
+        } catch (RuntimeException e) {
+
+            // 어떤 경우든 원점/목적지와 함께 로그
+            log.error("[Kakao] Route exception. origin={}, destination={}, error={}", originDbg, destDbg, e.toString(), e);
+            throw e;
+        }
     }
+
+//    // KaKaoMobilityFetchService
+//    public List<RoutingSummary.RouteLeg> computeRemainingLegs(List<Place> chain, int startIdx) {
+//        List<RoutingSummary.RouteLeg> tail = new ArrayList<>();
+//        for (int i = startIdx; i < Math.max(0, chain.size() - 1); i++) {
+//            RouteResult r = fetchKaKaoMobilityData(chain.get(i), chain.get(i + 1));
+//            tail.add(RoutingSummary.RouteLeg.builder()
+//                    .sequence(i + 1)
+//                    .origin(r.getOriginId())
+//                    .destination(r.getDestinationId())
+//                    .duration(r.getDuration())
+//                    .build());
+//        }
+//        return tail;
+//    }
+
 
     private KaKaoMobilityResponse getKaKaoMobilityFromApi(String origin, String destination) {
-        log.info("fetchRouteFromApi: origin={}, destination={}", origin, destination);
-        KaKaoMobilityResponse response = null;
-        try {
-            response = webClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path(kaKaoProperties.getRoute())
-                            .queryParam("origin", origin)
-                            .queryParam("destination", destination)
-                            .build())
-                    .retrieve()
-                    .bodyToMono(KaKaoMobilityResponse.class)
-                    .block();
-        } catch (Exception e) {
-            log.info("요청 에러");
-            throw new RuntimeException(e);
-        }
-        log.info("결과 코드:"+response.routes().get(0).result_code());
-        return response;
-
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(kaKaoProperties.getRoute())
+                        .queryParam("origin", origin)
+                        .queryParam("destination", destination)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, resp ->
+                        resp.bodyToMono(String.class)
+                                .defaultIfEmpty("")
+                                .flatMap(body -> {
+                                    log.error("[Kakao] HTTP error {}. origin={}, destination={}, body={}",
+                                            resp.statusCode().value(), origin, destination, body);
+                                    return Mono.error(new RuntimeException(
+                                            "카카오 API HTTP 오류: " + resp.statusCode().value() + " / " + body));
+                                })
+                )
+                .bodyToMono(KaKaoMobilityResponse.class)
+                .block();
     }
 
+    private static String dbg(Place p) {
+        return String.format("id=%s,title=%s,lon=%s,lat=%s",
+                p.getContentId(), p.getTitle(), p.getLongitude(), p.getLatitude());
+    }
 }

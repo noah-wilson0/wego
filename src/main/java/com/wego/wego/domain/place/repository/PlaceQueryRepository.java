@@ -18,4 +18,8 @@ public interface PlaceQueryRepository {
                                                         List<Long> cityCodeIds,
                                                         Pageable pageable);
 
+    List<GeminiPlaceItemResponse> searchGeminiPlaceItemResponseByTitleInCitiesAndLikeTitle(List<String> placeTypes,
+                                                                               List<Long> cityCodeIds,
+                                                                                     String title);
+
 }

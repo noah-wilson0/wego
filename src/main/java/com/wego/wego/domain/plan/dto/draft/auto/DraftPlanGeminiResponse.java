@@ -1,4 +1,4 @@
-package com.wego.wego.domain.plan.dto;
+package com.wego.wego.domain.plan.dto.draft.auto;
 
 import java.time.LocalDate;
 import java.util.List;

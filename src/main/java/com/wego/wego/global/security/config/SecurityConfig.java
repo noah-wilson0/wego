@@ -56,7 +56,7 @@ public class SecurityConfig {
                                 "/travel-share-plans/*/settlements/result", //공유자의 정산하기는 비회원도 가능
                                 "/feeds/all/paged",
                                 "/feeds/{feed_id}/comments",
-                                "/ai/places").permitAll()
+                                "/api/v1/ai/places","/api/v2/ai/places").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/draft-plans/*").permitAll()
                         .requestMatchers("/auth/sign-out",
                                 "/me/check-password", "/me/change-password",

@@ -96,6 +96,31 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
 
     }
 
+    @Override
+    public List<GeminiPlaceItemResponse> searchGeminiPlaceItemResponseByTitleInCitiesAndLikeTitle(List<String> placeTypes, List<Long> cityCodeIds, String title) {
+
+        List<GeminiPlaceItemResponse> places = jpaQueryFactory
+                .select(Projections.constructor(GeminiPlaceItemResponse.class,
+                        place.contentId,
+                        place.title,
+                        place.image,
+                        place.addr1,
+                        toDoubleOrZero(place.longitude),
+                        toDoubleOrZero(place.latitude),
+                        place.averageRating,
+                        place.likeCount))
+                .distinct()
+                .from(place)
+                .where(placeTypeIn(placeTypes),
+                        cityCodeIn(cityCodeIds),
+                        place.title.like(title))
+
+                .orderBy(place.averageRating.desc(), place.likeCount.desc())
+                .fetch();
+
+
+        return places;
+    }
 
 
     private static BooleanExpression cityCodeIn(List<Long> cityCodeIds) {
