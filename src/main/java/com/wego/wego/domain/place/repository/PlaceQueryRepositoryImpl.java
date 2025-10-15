@@ -107,7 +107,7 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
                         place.addr1,
                         toDoubleOrZero(place.longitude),
                         toDoubleOrZero(place.latitude),
-                        place.placeType,
+//                        place.placeType,
                         place.averageRating,
                         place.likeCount))
 //                .distinct() // similarity함수 사용을 위한 주석 처리

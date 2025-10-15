@@ -12,7 +12,7 @@ public class GeminiPlaceItemResponse {
     private String title;
     private String addr;
     private String tel;
-    private String placeType;
+
     private double latitude;
     private double longitude;
 
