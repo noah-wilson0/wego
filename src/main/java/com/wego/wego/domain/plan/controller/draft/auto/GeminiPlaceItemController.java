@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ai mcp request api
@@ -45,7 +46,7 @@ public class GeminiPlaceItemController {
             @PageableDefault(size=20, sort = {"averageRating", "likeCount"}, direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<GeminiPlaceItemResponse> placesPaged = draftPlanLangGraphService.getPlacesPaged(regionName, placeType, pageable);
-        log.info("mcp tool 사용됨");
+        log.info("v1/ai/places 사용됨");
         log.info("ai.getPlaces request region={}, types={}, page={}, size={}, sort={}",
                 regionName, placeType, pageable.getPageNumber(), pageable.getPageSize(), pageable.getSort());
 
@@ -58,8 +59,15 @@ public class GeminiPlaceItemController {
             @RequestParam String regionName,
             @RequestParam List<String> placeType,
             @RequestParam String title) {
+        log.info("RequestParam: region={}, types={}, title={}", regionName, placeType, title);
         List<GeminiPlaceItemResponse> search = draftPlanLangGraphService.searchPlace(regionName, placeType, title);
-
+        log.info("v2/ai/places 사용됨");
+        log.info("searchItems(size={}): [{}]",
+                search.size(),
+                search.stream()
+                        .map(it -> it.getTitle() + " | " + it.getAddr() + " | " + it.getTel())
+                        .collect(Collectors.joining(", "))
+        );
         return ResponseEntity.ok(search);
     }
 }

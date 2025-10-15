@@ -107,15 +107,18 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
                         place.addr1,
                         toDoubleOrZero(place.longitude),
                         toDoubleOrZero(place.latitude),
+                        place.placeType,
                         place.averageRating,
                         place.likeCount))
-                .distinct()
+//                .distinct() // similarity함수 사용을 위한 주석 처리
                 .from(place)
                 .where(placeTypeIn(placeTypes),
                         cityCodeIn(cityCodeIds),
-                        place.title.like(title))
+                        similarityGt(place.title,title,0.3))
 
-                .orderBy(place.averageRating.desc(), place.likeCount.desc())
+                .orderBy(place.averageRating.desc(),
+                        place.likeCount.desc(),
+                        similarityExpr(place.title,title).desc())
                 .fetch();
 
 
@@ -151,6 +154,10 @@ public class PlaceQueryRepositoryImpl implements PlaceQueryRepository {
                 "similarity({0}, {1})",
                 field, Expressions.constant(title)
         );
+    }
+
+    private static BooleanExpression similarityGt(StringPath field, String keyword, double threshold) {
+        return similarityExpr(field, keyword).gt(threshold);
     }
 
     /**

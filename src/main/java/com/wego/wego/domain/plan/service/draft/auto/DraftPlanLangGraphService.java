@@ -70,15 +70,18 @@ public class DraftPlanLangGraphService {
         // (1)~(3) FastAPI generate-initial 호출 부분 그대로
         String slugJson = redisTemplate.opsForValue().get(RedisKeyUtils.slugKey(uuid));
         String dateJson = redisTemplate.opsForValue().get(RedisKeyUtils.dateKey(uuid));
+        String timeJson = redisTemplate.opsForValue().get(RedisKeyUtils.timeKey(uuid));
         if (slugJson == null || dateJson == null) {
             throw new IllegalStateException("초기 입력(지역/날짜) 정보가 없습니다. 이전 단계가 완료되지 않았습니다.");
         }
 
         JsonNode slugNode;
         JsonNode dateNode;
+        JsonNode timeNode;
         try {
             slugNode = objectMapper.readTree(slugJson);
             dateNode = objectMapper.readTree(dateJson);
+            timeNode = objectMapper.readTree(timeJson);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("사용자 입력 파싱 실패", e);
         }
@@ -88,14 +91,23 @@ public class DraftPlanLangGraphService {
         String startDate = dateNode.get("startDate").asText();
         String endDate = dateNode.get("endDate").asText();
 
+        List<AutoGenerateInitialRequest.DayTime> dayTimes = new ArrayList<>();
+        for (JsonNode n : timeNode.get("travelDayTimes")) {
+            dayTimes.add(new AutoGenerateInitialRequest.DayTime(
+                    n.get("date").asText(),
+                    n.get("startTime").asText(), // Redis 키가 startTime
+                    n.get("endTime").asText()    // Redis 키가 endTime
+            ));
+        }
+
         var chemiSummaryForAiDto = memberRepository
                 .findChemiSummaryForAiDtoByMemberId(member.getId())
                 .orElseThrow(() -> new RuntimeException("케미 테스트 필요"));
 
         AutoGenerateInitialRequest req = new AutoGenerateInitialRequest(
-                member.getId(), regionName, startDate, endDate, chemiSummaryForAiDto
+                member.getId(), regionName, startDate, endDate, chemiSummaryForAiDto, dayTimes
         );
-
+        log.info("AutoGenerateInitialRequest:{}", req.toString());
         DraftPlanGeminiResponse gemini = autoWebClient.post()
                 .uri("/ai/generate-initial")
                 .bodyValue(req)
@@ -199,6 +211,7 @@ public class DraftPlanLangGraphService {
 
     public List<GeminiPlaceItemResponse> searchPlace(String regionName, List<String> placeTypes, String title) {
         List<Integer> cityIds = slugResolver.resolveCityIdsByLabel(regionName);
+//        log.info("searchPlaceParam:region={}, types={}, cityIds={}, title={}", regionName, placeTypes,cityIds, title);
         return placeRepository.searchGeminiPlaceItemResponseByTitleInCitiesAndLikeTitle(
                 placeTypes, cityIds.stream().mapToLong(Integer::longValue).boxed().toList(),
                 title

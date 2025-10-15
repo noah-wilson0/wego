@@ -3,13 +3,16 @@ package com.wego.wego.domain.plan.dto.draft.auto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class GeminiPlaceItemResponse {
     private String contentId;
     private String title;
     private String addr;
     private String tel;
+    private String placeType;
     private double latitude;
     private double longitude;
 
