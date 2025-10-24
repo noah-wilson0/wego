@@ -64,6 +64,24 @@ public class TravelPlanPlaceService {
                         .likeCount(place.getLikeCount())
                         .build());
     }
+    public Page<DraftPlanPlaceResponse> findAllByLabel(String label, String placeType, Pageable pageable) {
+
+        String slug = slugResolver.resolveSlugByLabel(label);
+        List<Integer> cityIds = slugResolver.resolveCityIds(slug);
+        log.info(cityIds.toString());
+        return placeRepository.findByPlaceTypeAndCityCodeIdIn(placeType, cityIds, pageable)
+                .map(place -> DraftPlanPlaceResponse.builder()
+                        .contentId(place.getContentId())
+                        .title(place.getTitle())
+                        .image(place.getImage())
+                        .placeType(place.getPlaceType())
+                        .addr(place.getAddr1())
+                        .longitude(Double.parseDouble(place.getLongitude()))
+                        .latitude(Double.parseDouble(place.getLatitude()))
+                        .averageRating(place.getAverageRating())
+                        .likeCount(place.getLikeCount())
+                        .build());
+    }
 
 
     public void saveTempSchedulePlace(String uuid, List<TempTravelPlanPlaceRequest> tempSchedulePlaceRequests) {

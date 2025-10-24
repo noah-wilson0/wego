@@ -3,6 +3,7 @@ package com.wego.wego.domain.place.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wego.wego.domain.place.dto.LabelSearchCondition;
 import com.wego.wego.domain.place.dto.SearchCondition;
 import com.wego.wego.domain.plan.dto.DraftPlanPlaceResponse;
 import com.wego.wego.domain.plan.service.support.SlugResolver;
@@ -46,6 +47,16 @@ public class PlaceQueryService {
             return Page.empty(pageable);
         }
         log.info(slug);
+        List<Integer> cityIds = slugResolver.resolveCityIds(slug);
+        log.info(cityIds.toString());
+        Page<DraftPlanPlaceResponse> draftPlanPlaceResponses = placeRepository.searchByTitleInCities(condition.placeTypes(), cityIds.stream().mapToLong(Integer::longValue).boxed().toList(), condition.keyword(), pageable);
+        log.info(draftPlanPlaceResponses.toString());
+        return draftPlanPlaceResponses;
+    }
+    public Page<DraftPlanPlaceResponse> searchByLabel(LabelSearchCondition condition, Pageable pageable) {
+
+        String slug= slugResolver.resolveSlugByLabel(condition.label());
+
         List<Integer> cityIds = slugResolver.resolveCityIds(slug);
         log.info(cityIds.toString());
         Page<DraftPlanPlaceResponse> draftPlanPlaceResponses = placeRepository.searchByTitleInCities(condition.placeTypes(), cityIds.stream().mapToLong(Integer::longValue).boxed().toList(), condition.keyword(), pageable);

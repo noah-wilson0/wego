@@ -26,7 +26,7 @@ public class DraftPlanPlaceController {
     private final TravelPlanPlaceService travelPlanPlaceService;
 
     /**
-     * 여행 장소/숙소 페이지 조회 -> /places로 병합 예정
+     * 여행 장소/숙소 페이지 조회
      * @param uuid
      * @param placeType
      * @param pageable
@@ -41,6 +41,7 @@ public class DraftPlanPlaceController {
         Page<DraftPlanPlaceResponse> travelPlanPlaceResponses = travelPlanPlaceService.findAll(uuid, placeType, pageable);
         return ResponseEntity.ok(travelPlanPlaceResponses);
     }
+
 
 
 

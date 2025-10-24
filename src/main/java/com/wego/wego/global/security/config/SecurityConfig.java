@@ -64,10 +64,14 @@ public class SecurityConfig {
                                 "/me/feeds", "/me/travel-plans","/me/travel-plans/imminent",
                                 "/travel-plans/*/me",
                                 "/travel-plans/*/share",
+                                "/travel-plans/*/settlements/result",
+                                "/travel-plans/*/storages",
+
+                                "/places/*/*/paged",
                                 "/chemis/similar","/chemis/labels",
 
                                 "/feeds/init/**",
-                                "/travel-plans/*/settlements/result",
+
                                 "/draft-plans/*/auto-schedule").hasRole("USER")
                         .requestMatchers(HttpMethod.DELETE, "/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/me",
