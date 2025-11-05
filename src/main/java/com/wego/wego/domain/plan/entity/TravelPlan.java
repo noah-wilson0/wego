@@ -60,4 +60,9 @@ public class TravelPlan {
     public void changeTravelPlanDays(List<TravelPlanDay> travelPlanDays) {
         this.travelPlanDays = travelPlanDays;
     }
+
+    public void addTravelPlanDay(TravelPlanDay newDay) {
+        newDay.belongToTravelPlan(this);
+        this.travelPlanDays.add(newDay);
+    }
 }

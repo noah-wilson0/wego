@@ -44,4 +44,7 @@ public class TravelPlanPlace {
     @Builder.Default
     private String memo="";
 
+    public void belongToTravelPlanDay(TravelPlanDay travelPlanDay) {
+        this.travelPlanDay = travelPlanDay;
+    }
 }

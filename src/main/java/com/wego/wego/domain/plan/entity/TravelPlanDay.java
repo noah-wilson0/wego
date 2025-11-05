@@ -53,4 +53,18 @@ public class TravelPlanDay {
     public void changeTravelTravelPlanRoutes(List<TravelPlanRoute> travelPlanRoutes) {
         this.travelPlanRoutes = travelPlanRoutes;
     }
+
+    public void addTravelPlanPlace(TravelPlanPlace travelPlanPlace) {
+        this.travelPlanPlaces.add(travelPlanPlace);
+        travelPlanPlace.belongToTravelPlanDay(this);
+    }
+    public void addTravelPlanRoute(TravelPlanRoute travelPlanRoute) {
+        this.travelPlanRoutes.add(travelPlanRoute);
+        travelPlanRoute.belongToTravelPlanDay(this);
+    }
+
+    public void belongToTravelPlan(TravelPlan travelPlan) {
+        this.travelPlan = travelPlan;
+    }
+
 }

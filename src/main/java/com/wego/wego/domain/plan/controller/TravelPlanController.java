@@ -46,4 +46,7 @@ public class TravelPlanController {
         return ResponseEntity.ok().body(travelPlanResponse);
     }
 
+
+
+
 }

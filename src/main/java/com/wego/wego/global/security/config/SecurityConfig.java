@@ -63,6 +63,11 @@ public class SecurityConfig {
                                 "/me/change-info", "/me/chemi",
                                 "/me/feeds", "/me/travel-plans","/me/travel-plans/imminent",
                                 "/travel-plans/*/me",
+
+                                "/travel-plans/*/me/edit",
+                                 "/travel-plans/*/edit/days/*",
+                                 "/travel-plans/*/edit/days/*/time",
+
                                 "/travel-plans/*/share",
                                 "/travel-plans/*/settlements/result",
                                 "/travel-plans/*/storages",

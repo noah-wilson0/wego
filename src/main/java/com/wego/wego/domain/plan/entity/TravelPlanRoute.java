@@ -46,4 +46,7 @@ public class TravelPlanRoute {
     private int duration;
 
 
+    public void belongToTravelPlanDay(TravelPlanDay travelPlanDay) {
+        this.travelPlanDay = travelPlanDay;
+    }
 }
