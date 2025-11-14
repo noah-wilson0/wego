@@ -5,6 +5,7 @@ import com.wego.wego.domain.plan.entity.TravelPlan;
 import com.wego.wego.domain.plan.entity.TravelPlanDay;
 import com.wego.wego.domain.plan.entity.TravelPlanRoute;
 import com.wego.wego.external.tourapi.place.entity.Place;
+import lombok.AllArgsConstructor;
 import lombok.With;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param routes
  * @param createdAt
  */
+
 public record TravelPlanNormalizeResponse(
         @With
         String label,
@@ -68,6 +70,17 @@ public record TravelPlanNormalizeResponse(
             String destination,
             int duration
     ) {}
+
+    public static TravelPlanNormalizeResponse of(
+            String label,
+            LocalDate start_date,
+            LocalDate end_date,
+            List<DaySchedule> days,
+            List<RouteInfo> routes,
+            LocalDate createdAt
+    ) {
+        return new TravelPlanNormalizeResponse(label, start_date, end_date, days, routes, createdAt);
+    }
 
     public TravelPlanNormalizeResponse(TravelPlan plan) {
         this(

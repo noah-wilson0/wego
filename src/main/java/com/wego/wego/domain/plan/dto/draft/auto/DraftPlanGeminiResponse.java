@@ -16,7 +16,7 @@ public record DraftPlanGeminiResponse(
             String start_time,
             String end_time,
             List<DraftPlanGeminiResponse.Days.Places> places,
-            DraftPlanGeminiResponse.Days.Accommodation accommodation
+            Accommodation accommodation
 
     ) {
         public record Places(

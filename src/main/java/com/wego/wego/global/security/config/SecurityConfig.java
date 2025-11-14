@@ -67,6 +67,7 @@ public class SecurityConfig {
                                 "/travel-plans/*/me/edit",
                                  "/travel-plans/*/edit/days/*",
                                  "/travel-plans/*/edit/days/*/time",
+                                 "/travel-plans/*/edit/ai/generate",
 
                                 "/travel-plans/*/share",
                                 "/travel-plans/*/settlements/result",

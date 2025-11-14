@@ -37,7 +37,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(3600)
+                .maxAge(14400) //3600 인데 테스트중에는 14400사용
                 .sameSite("Strict")
                 .build();
 
