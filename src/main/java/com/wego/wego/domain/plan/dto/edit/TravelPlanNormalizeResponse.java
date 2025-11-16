@@ -139,6 +139,11 @@ public record TravelPlanNormalizeResponse(
                                         travelPlanRoute.getDuration()
                                 );
                             }).toList();
+                    if (travelPlanDay.getTravelPlanRoutes().isEmpty()) {
+                        routeTypeRef.set("");
+                        dailyRoute.put(travelPlanDay.getDate(), List.of());
+                        return;
+                    }
                     routeTypeRef.set(travelPlanDay.getTravelPlanRoutes().getFirst().getRouteType().toString());
                     dailyRoute.put(travelPlanDay.getDate(), routeItems);
 

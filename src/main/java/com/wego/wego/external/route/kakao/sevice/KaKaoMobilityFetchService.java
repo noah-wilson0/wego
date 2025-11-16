@@ -1,21 +1,18 @@
 package com.wego.wego.external.route.kakao.sevice;
 
-import com.wego.wego.domain.plan.dto.draft.route.RoutingSummary;
+import com.wego.wego.external.route.dto.RouteResult;
 import com.wego.wego.external.route.exception.KakaoRouteException;
 import com.wego.wego.external.route.kakao.config.KaKaoProperties;
 import com.wego.wego.external.route.kakao.dto.KaKaoMobilityResponse;
-import com.wego.wego.external.route.dto.RouteResult;
 import com.wego.wego.external.route.kakao.utils.KaKaoCoordinateFormatter;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.http.HttpStatusCode;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 /**
  *
@@ -27,7 +24,15 @@ import java.util.Map;
     * 일정 -1만큼 마지막 노드는 숙소가 추가된다.
     *  이를 만족하는 객체를 만든 후 이것을 getCarKaKaoMobility에 넣고 루프를 돌려서 장소쌍마다 fetchKaKaoMobilityData을 돌린다.
  */
-
+/**
+ * 이코드 완성시 EditPlanRepairContext는 삭제 해도 된다. @Recover 애노테이션 적용시 retryable에 사용된 파라미터를 그대로 가져올 수 있다.
+ * 단, 파라미터 순서가 바뀌면 안된다.
+ * url: https://developers.kakaomobility.com/docs/navi-api/reference/
+ * 104 -> 이동시간 0분 처리
+ * 105 -> kakao mobility api query param 에 roadevent:2로 해결 가능
+ * 106 -> kakao mobility api query param 에 roadevent:2로 해결 가능
+ *
+ */
 
 @Slf4j
 @Service
@@ -139,6 +144,7 @@ public class KaKaoMobilityFetchService {
                         .path(kaKaoProperties.getRoute())
                         .queryParam("origin", origin)
                         .queryParam("destination", destination)
+                        .queryParam("roadevent",2)
                         .build())
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, resp ->
