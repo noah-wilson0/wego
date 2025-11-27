@@ -24,8 +24,9 @@ public class TravelPlanEditController {
      * @return
      */
     @PatchMapping("/me")
-    public ResponseEntity<?> saveEditTravelPlan(@PathVariable Long travelPlanId) {
-        travelPlanEditService.updateTravelPlan(travelPlanId);
+    public ResponseEntity<?> saveEditTravelPlan(@AuthenticationPrincipal Member member,
+                                                @PathVariable Long travelPlanId) {
+        travelPlanEditService.updateTravelPlan(member.getId(), travelPlanId);
         return ResponseEntity.ok().build();
     }
 
@@ -38,50 +39,55 @@ public class TravelPlanEditController {
 
     @DeleteMapping("/me")
     public ResponseEntity<?> getTravelPlanScheduleFindOne(@PathVariable String travelPlanId, @AuthenticationPrincipal Member member) {
-         travelPlanEditService.deleteTravelPlan(travelPlanId);
+         travelPlanEditService.deleteTravelPlan(member.getId(), travelPlanId);
 
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me/edit")
-    public ResponseEntity<TravelPlanNormalizeResponse> travelPlan(@PathVariable Long travelPlanId) {
-        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.getNormalizeTravelPlan(travelPlanId);
+    public ResponseEntity<TravelPlanNormalizeResponse> travelPlan(@AuthenticationPrincipal Member member,
+                                                                  @PathVariable Long travelPlanId) {
+        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.getNormalizeTravelPlan(member.getId(),travelPlanId);
 
         log.info(travelPlanNormalizeResponse.toString());
         return ResponseEntity.ok(travelPlanNormalizeResponse);
     }
 
     @PostMapping("/edit/days/{date}")
-    public ResponseEntity<TravelPlanNormalizeResponse> editInsert(@PathVariable Long travelPlanId,
+    public ResponseEntity<TravelPlanNormalizeResponse> editInsert(@AuthenticationPrincipal Member member,
+                                                                  @PathVariable Long travelPlanId,
                                   @PathVariable LocalDate date,
                                   @RequestBody EditTravelPlanPlaceInsertRequest editTravelPlanPlaceInsertRequest) {
-        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editInsert(travelPlanId, date, editTravelPlanPlaceInsertRequest);
+        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editInsert(member.getId(), travelPlanId, date, editTravelPlanPlaceInsertRequest);
         return ResponseEntity.ok(travelPlanNormalizeResponse);
     }
 
     @PatchMapping("/edit/days/{date}")
-    public ResponseEntity<TravelPlanNormalizeResponse> editMove(@PathVariable Long travelPlanId,
+    public ResponseEntity<TravelPlanNormalizeResponse> editMove(@AuthenticationPrincipal Member member,
+                                                                @PathVariable Long travelPlanId,
                                   @PathVariable LocalDate date,
                                   @RequestBody EditTravelPlanPlaceMoveRequest editTravelPlanPlaceMoveRequest) {
-        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editMove(travelPlanId, date, editTravelPlanPlaceMoveRequest);
+        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editMove(member.getId(), travelPlanId, date, editTravelPlanPlaceMoveRequest);
         return ResponseEntity.ok(travelPlanNormalizeResponse);
     }
 
     @DeleteMapping("/edit/days/{date}")
-    public ResponseEntity<TravelPlanNormalizeResponse> editDelete(@PathVariable Long travelPlanId,
+    public ResponseEntity<TravelPlanNormalizeResponse> editDelete(@AuthenticationPrincipal Member member,
+                                                                  @PathVariable Long travelPlanId,
                                   @PathVariable LocalDate date,
                                   @RequestBody EditTravelPlanPlaceDeleteRequest editTravelPlanPlaceDeleteRequest) {
-        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editDelete(travelPlanId, date, editTravelPlanPlaceDeleteRequest);
+        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.editDelete(member.getId(), travelPlanId, date, editTravelPlanPlaceDeleteRequest);
 
         return ResponseEntity.ok(travelPlanNormalizeResponse);
     }
 
 
     @PatchMapping("/edit/days/{date}/time")
-    public ResponseEntity<TravelPlanNormalizeResponse> updateStartTime(@PathVariable Long travelPlanId,
+    public ResponseEntity<TravelPlanNormalizeResponse> updateStartTime(@AuthenticationPrincipal Member member,
+                                                                    @PathVariable Long travelPlanId,
                                                                   @PathVariable LocalDate date,
                                                                   @RequestBody EditTravelPlanDayTimeRequest editTravelPlanDayTimeRequest) {
-        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.changeTravelPlanDayTime(travelPlanId, date, editTravelPlanDayTimeRequest);
+        TravelPlanNormalizeResponse travelPlanNormalizeResponse = travelPlanEditService.changeTravelPlanDayTime(member.getId(), travelPlanId, date, editTravelPlanDayTimeRequest);
 
         return ResponseEntity.ok(travelPlanNormalizeResponse);
     }

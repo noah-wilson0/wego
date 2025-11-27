@@ -4,6 +4,7 @@ public class RedisKeyUtils {
 
     private static final String DRAFT_PLAN_BASE_PREFIX = "wego:draft-plan";
     private static final String TRAVEL_PLAN_BASE_PREFIX = "wego:travel-plan";
+    private static final String REVISE_PLAN_BASE_PREFIX = "wego:revise-plan";
 
     // 여행 일정 날짜 저장 키
     public static String slugKey(String uuid) {
@@ -45,8 +46,11 @@ public class RedisKeyUtils {
         return String.format("%s:%s:temp", DRAFT_PLAN_BASE_PREFIX, uuid);
     }
 
-    public static String editTravelPlanKey(String travelPlanId) {
-        return String.format("%s:%s", TRAVEL_PLAN_BASE_PREFIX, travelPlanId);
+    public static String editTravelPlanKey(String memberId, String travelPlanId) {
+        return String.format("%s:%s:%s", TRAVEL_PLAN_BASE_PREFIX, memberId, travelPlanId);
+    }
+    public static String reviseTravelPlanKey(String memberId, String travelPlanId) {
+        return String.format("%s:%s:%s", REVISE_PLAN_BASE_PREFIX, memberId, travelPlanId);
     }
 
 

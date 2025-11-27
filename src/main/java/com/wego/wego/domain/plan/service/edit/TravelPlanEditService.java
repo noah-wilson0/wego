@@ -44,9 +44,9 @@ public class TravelPlanEditService {
 
 
     @Transactional
-    public void updateTravelPlan(Long travelPlanId) {
+    public void updateTravelPlan(Long memberId, Long travelPlanId) {
         // 1) Redis에서 최신 편집본 로드
-        String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(travelPlanId));
+        String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(memberId), String.valueOf(travelPlanId));
         String json = redisTemplate.opsForValue().get(key);
         if (json == null) {
             throw new IllegalStateException("편집본이 Redis에 없습니다: key=" + key);
@@ -159,16 +159,17 @@ public class TravelPlanEditService {
     }
 
 
-    public void deleteTravelPlan(String travelPlanId) {
-        redisTemplate.delete(RedisKeyUtils.editTravelPlanKey(String.valueOf(travelPlanId)));
+    public void deleteTravelPlan(Long memberId, String travelPlanId) {
+        redisTemplate.delete(RedisKeyUtils.editTravelPlanKey(String.valueOf(memberId), String.valueOf(travelPlanId)));
     }
 
     public TravelPlanNormalizeResponse editInsert(
+            Long memberId,
             Long travelPlanId,
             LocalDate date,
             EditTravelPlanPlaceInsertRequest req
     ) {
-        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(travelPlanId);
+        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(String.valueOf(memberId), travelPlanId);
 
         int dayIdx = indexOfDay(plan, date);
         if (dayIdx < 0) throw new IllegalArgumentException("해당 날짜 day가 없습니다: " + date);
@@ -221,16 +222,17 @@ public class TravelPlanEditService {
                 List.of(new TravelPlanNormalizeResponse.RouteInfo(routeType, updatedDailyRoutes)),
                 plan.createdAt()
         );
-        saveToRedis(travelPlanId, updated);
+        saveToRedis(String.valueOf(memberId),travelPlanId, updated);
         return updated;
     }
 
     public TravelPlanNormalizeResponse editDelete(
+            Long memberId,
             Long travelPlanId,
             LocalDate date,
             EditTravelPlanPlaceDeleteRequest req
     ) {
-        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(travelPlanId);
+        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(String.valueOf(memberId), travelPlanId);
 
         int dayIdx = indexOfDay(plan, date);
         if (dayIdx < 0) throw new IllegalArgumentException("해당 날짜 day가 없습니다: " + date);
@@ -271,16 +273,17 @@ public class TravelPlanEditService {
                 List.of(new TravelPlanNormalizeResponse.RouteInfo(routeType, updatedDailyRoutes)),
                 plan.createdAt()
         );
-        saveToRedis(travelPlanId, updated);
+        saveToRedis(String.valueOf(memberId), travelPlanId, updated);
         return updated;
     }
 
     public TravelPlanNormalizeResponse editMove(
+            Long memberId,
             Long travelPlanId,
             LocalDate date, // fromDay
             EditTravelPlanPlaceMoveRequest req
     ) {
-        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(travelPlanId);
+        TravelPlanNormalizeResponse plan = loadOrCreateEditPlan(String.valueOf(memberId), travelPlanId);
 
         int fromDayIdx = indexOfDay(plan, date);
         if (fromDayIdx < 0) throw new IllegalArgumentException("해당 날짜(from) day가 없습니다: " + date);
@@ -360,14 +363,15 @@ public class TravelPlanEditService {
                 List.of(new TravelPlanNormalizeResponse.RouteInfo(routeType, updatedDailyRoutes)),
                 plan.createdAt()
         );
-        saveToRedis(travelPlanId, updated);
+        saveToRedis(String.valueOf(memberId), travelPlanId, updated);
         return updated;
     }
 
-    public TravelPlanNormalizeResponse changeTravelPlanDayTime(Long travelPlanId,
+    public TravelPlanNormalizeResponse changeTravelPlanDayTime(Long memberId,
+                                                               Long travelPlanId,
                                                                LocalDate date,
                                                                EditTravelPlanDayTimeRequest req) {
-        final String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(travelPlanId));
+        final String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(memberId), String.valueOf(travelPlanId));
         final String json = redisTemplate.opsForValue().get(key);
         if (json == null) {
             throw new IllegalStateException("편집본이 Redis에 없습니다: key=" + key);
@@ -445,12 +449,12 @@ public class TravelPlanEditService {
 
 
 
-    public TravelPlanNormalizeResponse getNormalizeTravelPlan(Long travelPlanId) {
-        return loadOrCreateEditPlan(travelPlanId);
+    public TravelPlanNormalizeResponse getNormalizeTravelPlan(Long memberId, Long travelPlanId) {
+        return loadOrCreateEditPlan(String.valueOf(memberId), travelPlanId);
     }
 
-    private TravelPlanNormalizeResponse loadOrCreateEditPlan(Long travelPlanId) {
-        String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(travelPlanId));
+    private TravelPlanNormalizeResponse loadOrCreateEditPlan(String memberId, Long travelPlanId) {
+        String key = RedisKeyUtils.editTravelPlanKey(memberId, String.valueOf(travelPlanId));
 
         if (!redisTemplate.hasKey(key)) {
             TravelPlan travelPlan = travelPlanRepository.findById(travelPlanId)
@@ -473,8 +477,8 @@ public class TravelPlanEditService {
         }
     }
 
-    private void saveToRedis(Long travelPlanId, TravelPlanNormalizeResponse updated) {
-        String key = RedisKeyUtils.editTravelPlanKey(String.valueOf(travelPlanId));
+    private void saveToRedis(String memberId, Long travelPlanId, TravelPlanNormalizeResponse updated) {
+        String key = RedisKeyUtils.editTravelPlanKey(memberId, String.valueOf(travelPlanId));
         try {
             String json = objectMapper.writeValueAsString(updated);
             redisTemplate.opsForValue().set(key, json);
