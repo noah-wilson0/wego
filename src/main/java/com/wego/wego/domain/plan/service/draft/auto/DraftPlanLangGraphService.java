@@ -9,7 +9,7 @@ import com.wego.wego.domain.plan.dto.DraftPlanResponse;
 import com.wego.wego.domain.plan.dto.draft.auto.*;
 import com.wego.wego.domain.plan.dto.draft.route.DraftPlanRoutingRequest;
 import com.wego.wego.domain.plan.dto.draft.route.RoutingSummary;
-import com.wego.wego.domain.plan.service.support.SlugResolver;
+import com.wego.wego.domain.plan.support.SlugResolver;
 import com.wego.wego.domain.plan.util.RouteScheduleUtil;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.repository.PlaceRepository;

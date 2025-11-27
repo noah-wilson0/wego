@@ -10,6 +10,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  private RoutingSummary snapshot; 와
+ *  rivate RoutingSummary routingSummarySnapshot;  왜 두게가 있지?
+ */
 @Getter @Setter
 public class RepairContext {
     // 필수

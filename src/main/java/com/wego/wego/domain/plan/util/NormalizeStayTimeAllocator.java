@@ -1,8 +1,8 @@
 package com.wego.wego.domain.plan.util;
 
-import com.wego.wego.domain.plan.dto.draft.route.DraftPlanRoutingRequest;
-import com.wego.wego.domain.plan.dto.draft.route.RoutingSummary;
 import com.wego.wego.domain.plan.dto.edit.TravelPlanNormalizeResponse;
+import com.wego.wego.domain.plan.dto.edit.route.EditPlanRoutingRequest;
+import com.wego.wego.domain.plan.dto.edit.route.EditPlanRoutingResponse;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import lombok.NoArgsConstructor;
 
@@ -26,27 +26,27 @@ public final class NormalizeStayTimeAllocator {
 
     /** 해당 날짜의 legs를 직접 넘겨 호출(가중치 기반). */
     public static TravelPlanNormalizeResponse.DaySchedule allocateTravelPlanWeightedStayTimes(
-            DraftPlanRoutingRequest.RoutingDaySpec daySpec,
-            List<RoutingSummary.RouteLeg> legs
+            EditPlanRoutingRequest.DailyRouteRequest day,
+            List<EditPlanRoutingResponse.RouteEdge> routeEdges
     ) {
         // 1) places만 사용(숙소는 뒤에 붙이지 않음)
-        List<Place> ordered = new ArrayList<>(daySpec.places() == null ? List.of() : daySpec.places());
+        List<Place> ordered = new ArrayList<>(day.getPlaces() == null ? List.of() : day.getPlaces());
 
         // 2) 시간창 계산(가중치)
         List<StayWindow> wins = allocateDailyWeightedStayTimes(
-                daySpec.start_time(),
-                daySpec.end_time(),
+                day.getStart_time(),
+                day.getEnd_time(),
                 ordered,
-                legs == null ? Collections.emptyList() : legs
+                routeEdges == null ? Collections.emptyList() : routeEdges
         );
 
         // 3) wins → Normalize.PlaceItem으로 매핑
         List<TravelPlanNormalizeResponse.PlaceItem> placeItems = buildPlaceItems(ordered, wins);
 
         return new TravelPlanNormalizeResponse.DaySchedule(
-                daySpec.date(),
-                daySpec.start_time(),
-                daySpec.end_time(),
+                day.getDate(),
+                day.getStart_time(),
+                day.getEnd_time(),
                 placeItems
         );
     }
@@ -60,13 +60,13 @@ public final class NormalizeStayTimeAllocator {
             LocalTime dayStart,
             LocalTime dayEnd,
             List<Place> ordered,
-            List<RoutingSummary.RouteLeg> legs
+            List<EditPlanRoutingResponse.RouteEdge> routeEdges
     ) {
         final int n = ordered == null ? 0 : ordered.size();
         if (n == 0) return Collections.emptyList();
 
         long totalSec = Math.max(0L, Duration.between(dayStart, dayEnd).getSeconds());
-        long moveSec = legs == null ? 0L : legs.stream().mapToLong(RoutingSummary.RouteLeg::duration).sum();
+        long moveSec = routeEdges == null ? 0L : routeEdges.stream().mapToLong(EditPlanRoutingResponse.RouteEdge::duration).sum();
         long stayPool = Math.max(0L, totalSec - moveSec);
 
         // 타입별 가중치
@@ -114,7 +114,7 @@ public final class NormalizeStayTimeAllocator {
 
             // 다음 시작 = 현재 종료 + 이동시간
             if (i < n - 1) {
-                long leg = (legs != null && i < legs.size()) ? legs.get(i).duration() : 0L;
+                long leg = (routeEdges != null && i < routeEdges.size()) ? routeEdges.get(i).duration() : 0L;
                 cursor = plusSecondsSafe(e, leg);
             }
         }

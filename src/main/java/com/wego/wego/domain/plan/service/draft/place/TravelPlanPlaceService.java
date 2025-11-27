@@ -7,7 +7,7 @@ import com.wego.wego.domain.plan.dto.TempTravelPlanPlaceRequest;
 import com.wego.wego.domain.plan.dto.DraftPlanPlaceResponse;
 import com.wego.wego.domain.plan.repository.AreaSlugRepository;
 import com.wego.wego.domain.plan.repository.CitySlugRepository;
-import com.wego.wego.domain.plan.service.support.SlugResolver;
+import com.wego.wego.domain.plan.support.SlugResolver;
 import com.wego.wego.external.tourapi.location.repository.CityCodeRepository;
 import com.wego.wego.external.tourapi.place.repository.PlaceRepository;
 import com.wego.wego.global.util.RedisKeyUtils;

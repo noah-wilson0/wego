@@ -1,4 +1,4 @@
-package com.wego.wego.domain.plan.service.support;
+package com.wego.wego.domain.plan.support;
 
 import com.wego.wego.domain.plan.repository.AreaSlugRepository;
 import com.wego.wego.domain.plan.repository.CitySlugRepository;

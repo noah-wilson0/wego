@@ -12,7 +12,7 @@ import com.wego.wego.domain.plan.entity.TravelPlanDay;
 import com.wego.wego.domain.plan.entity.TravelPlanPlace;
 import com.wego.wego.domain.plan.entity.TravelPlanRoute;
 import com.wego.wego.domain.plan.repository.TravelPlanRepository;
-import com.wego.wego.domain.plan.service.support.SlugResolver;
+import com.wego.wego.domain.plan.support.SlugResolver;
 import com.wego.wego.external.tourapi.place.entity.Place;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.enums.RouteType;

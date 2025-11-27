@@ -5,7 +5,7 @@ import com.wego.wego.domain.plan.dto.TravelPlanResponse;
 import com.wego.wego.domain.plan.entity.*;
 import com.wego.wego.domain.plan.repository.TravelPlanRepository;
 import com.wego.wego.domain.plan.repository.TravelPlanShareRepository;
-import com.wego.wego.domain.plan.service.support.SlugResolver;
+import com.wego.wego.domain.plan.support.SlugResolver;
 import com.wego.wego.domain.plan.util.ShareTokenUtil;
 import com.wego.wego.external.tourapi.place.service.PlaceService;
 import com.wego.wego.global.enums.PlaceType;
